@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard MTD Suri - Funil de Vendas</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --suri-blue: #5B68F5;
+            --suri-green: #5FC88F;
+            --suri-red: #FF6B6B;
+            --suri-yellow: #FFD93D;
+            --suri-purple: #A64DFF;
+            --suri-pink: #FF6BBF;
+            --suri-gold: #FFB84D;
+            --bg-primary: #F8F9FC;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C9E;
+            --border-color: #E8ECF1;
+        }
+        
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #F8F9FC 0%, #E8ECF1 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+        
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--suri-blue) 0%, var(--suri-green) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .login-box h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-box p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--suri-blue);
+            box-shadow: 0 0 0 4px rgba(91, 104, 245, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--suri-blue) 0%, var(--suri-green) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(91, 104, 245, 0.3);
+        }
+        
+        .error-message {
+            color: var(--suri-red);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        #dashboardContent {
+            display: none;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-suri {
+            width: 100px;
+            height: auto;
+        }
+        
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .mtd-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+        
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .month-selector label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        #monthSelect {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #monthSelect:hover {
+            border-color: var(--suri-blue);
+        }
+        
+        #monthSelect:focus {
+            outline: none;
+            border-color: var(--suri-blue);
+            box-shadow: 0 0 0 4px rgba(91, 104, 245, 0.1);
+        }
+        
+        .main-container {
+            padding: 0;
+            max-width: 100%;
+            margin: 0;
+            height: calc(100vh - 140px);
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            height: 100%;
+            padding: 1.5rem;
+        }
+        
+        .funnel-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 0;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: 100%;
+        }
+        
+        .funnel-stage {
+            position: relative;
+            background: linear-gradient(135deg, var(--stage-color) 0%, var(--stage-color-light) 100%);
+            padding: 1.5rem 1.8rem;
+            margin: 0.4rem auto;
+            cursor: pointer;
+            transition: all 0.3s;
+            clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+        
+        .funnel-stage:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .funnel-stage.active {
+            box-shadow: 0 0 0 3px var(--suri-blue);
+        }
+        
+        .funnel-stage:nth-child(1) { width: 95%; --stage-color: var(--suri-yellow); --stage-color-light: #FFE57F; }
+        .funnel-stage:nth-child(3) { width: 85%; --stage-color: var(--suri-blue); --stage-color-light: #7B88FF; }
+        .funnel-stage:nth-child(5) { width: 75%; --stage-color: var(--suri-purple); --stage-color-light: #BF7FFF; }
+        .funnel-stage:nth-child(7) { width: 65%; --stage-color: var(--suri-pink); --stage-color-light: #FF8FD4; }
+        .funnel-stage:nth-child(9) { width: 55%; --stage-color: var(--suri-green); --stage-color-light: #7FD9AF; }
+        
+        .stage-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .stage-icon {
+            font-size: 1.8rem;
+        }
+        
+        .stage-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stage-data {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+        
+        .data-item {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            padding: 0.6rem;
+            border-radius: 8px;
+        }
+        
+        .data-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+        
+        .data-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .data-percentage {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 0.2rem;
+        }
+        
+        .data-percentage.positive {
+            color: #4CAF50;
+        }
+        
+        .data-percentage.negative {
+            color: #FF5252;
+        }
+        
+        .conversion-badge {
+            text-align: center;
+            padding: 0.3rem 0;
+            margin: 0.2rem auto;
+            width: 70%;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        
+        .conversion-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.1rem;
+        }
+        
+        .conversion-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--suri-blue);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ticket-medio-badge {
+            text-align: center;
+            padding: 0.5rem 0;
+            margin: 0.3rem auto;
+            width: 70%;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        
+        .ticket-medio-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+        
+        .ticket-medio-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--suri-green);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .charts-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            max-height: 100%;
+        }
+        
+        .chart-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            height: 320px;
+            max-height: 320px;
+            flex-shrink: 0;
+        }
+        
+        .chart-card canvas {
+            height: 240px !important;
+            max-height: 240px !important;
+        }
+        
+        .chart-card.highlight {
+            box-shadow: 0 0 0 3px var(--suri-blue), 0 8px 25px rgba(91, 104, 245, 0.2);
+            transform: scale(1.02);
+        }
+        
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 400;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: transparent;
+        }
+        
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        
+        .heart-icon {
+            color: var(--suri-blue);
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .funnel-column {
+                max-height: 50vh;
+            }
+            
+            .charts-column {
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen">
+        <div class="login-box">
+            <h2>Dashboard MTD Suri</h2>
+            <p>Digite a senha para acessar</p>
+            <input 
+                type="password" 
+                id="passwordInput" 
+                class="login-input" 
+                placeholder="Digite a senha..."
+                autocomplete="off"
+            >
+            <button onclick="checkPassword()" class="login-btn">Entrar</button>
+            <div id="errorMessage" class="error-message">Senha incorreta. Tente novamente.</div>
+        </div>
+    </div>
+
+    <div id="dashboardContent">
+        <header class="header">
+            <div class="header-left">
+                <img src="https://www.genspark.ai/api/files/s/rKZUMQt4" alt="Logo Suri" class="logo-suri">
+                <div class="header-title">
+                    <h1>Suri Dashboard MTD</h1>
+                    <span class="mtd-info" id="mtdInfo">MTD até 26/11/2025</span>
+                </div>
+            </div>
+            <div class="month-selector">
+                <label for="monthSelect">Mês:</label>
+                <select id="monthSelect" onchange="loadData()">
+                    <option value="2025-01">Janeiro 2025</option>
+                    <option value="2025-02">Fevereiro 2025</option>
+                    <option value="2025-03">Março 2025</option>
+                    <option value="2025-04">Abril 2025</option>
+                    <option value="2025-05">Maio 2025</option>
+                    <option value="2025-06">Junho 2025</option>
+                    <option value="2025-07">Julho 2025</option>
+                    <option value="2025-08">Agosto 2025</option>
+                    <option value="2025-09">Setembro 2025</option>
+                    <option value="2025-10">Outubro 2025</option>
+                    <option value="2025-11" selected>Novembro 2025</option>
+                    <option value="2025-12">Dezembro 2025</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <div class="grid-container">
+                
+                <div class="funnel-column">
+                    
+                    <div class="funnel-stage" data-stage="leads" onclick="highlightChart('leads')">
+                        <div class="stage-header">
+                            <span class="stage-icon">🎯</span>
+                            <span class="stage-name">LEADS</span>
+                        </div>
+                        <div class="stage-data">
+                            <div class="data-item">
+                                <div class="data-label">Realizado</div>
+                                <div class="data-value" id="leads-realizado">1.278</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Esperado</div>
+                                <div class="data-value" id="leads-esperado">1.820</div>
+                            </div>
+                        </div>
+                        <div class="data-percentage negative" id="leads-percentage">-29,8%</div>
+                    </div>
+                    
+                    <div class="conversion-badge">
+                        <div class="conversion-label">↓ Conversão</div>
+                        <div class="conversion-value" id="conv-leads-agendados">89,2%</div>
+                    </div>
+                    
+                    <div class="funnel-stage" data-stage="agendados" onclick="highlightChart('agendados')">
+                        <div class="stage-header">
+                            <span class="stage-icon">📅</span>
+                            <span class="stage-name">AGENDADOS</span>
+                        </div>
+                        <div class="stage-data">
+                            <div class="data-item">
+                                <div class="data-label">Realizado</div>
+                                <div class="data-value" id="agendados-realizado">1.140</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Esperado</div>
+                                <div class="data-value" id="agendados-esperado">1.620</div>
+                            </div>
+                        </div>
+                        <div class="data-percentage negative" id="agendados-percentage">-29,6%</div>
+                    </div>
+                    
+                    <div class="conversion-badge">
+                        <div class="conversion-label">↓ Conversão</div>
+                        <div class="conversion-value" id="conv-agendados-reunioes">112,1%</div>
+                    </div>
+                    
+                    <div class="funnel-stage" data-stage="reunioes" onclick="highlightChart('reunioes')">
+                        <div class="stage-header">
+                            <span class="stage-icon">🤝</span>
+                            <span class="stage-name">REUNIÕES</span>
+                        </div>
+                        <div class="stage-data">
+                            <div class="data-item">
+                                <div class="data-label">Realizado</div>
+                                <div class="data-value" id="reunioes-realizado">1.278</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Esperado</div>
+                                <div class="data-value" id="reunioes-esperado">1.595</div>
+                            </div>
+                        </div>
+                        <div class="data-percentage negative" id="reunioes-percentage">-19,9%</div>
+                    </div>
+                    
+                    <div class="conversion-badge">
+                        <div class="conversion-label">↓ Conversão</div>
+                        <div class="conversion-value" id="conv-reunioes-vendas">100,0%</div>
+                    </div>
+                    
+                    <div class="funnel-stage" data-stage="vendas" onclick="highlightChart('vendas')">
+                        <div class="stage-header">
+                            <span class="stage-icon">💰</span>
+                            <span class="stage-name">VENDAS</span>
+                        </div>
+                        <div class="stage-data">
+                            <div class="data-item">
+                                <div class="data-label">Realizado</div>
+                                <div class="data-value" id="vendas-realizado">1.278</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Esperado</div>
+                                <div class="data-value" id="vendas-esperado">1.585</div>
+                            </div>
+                        </div>
+                        <div class="data-percentage negative" id="vendas-percentage">-19,4%</div>
+                    </div>
+                    
+                    <div class="ticket-medio-badge">
+                        <div class="ticket-medio-label">💵 Ticket Médio</div>
+                        <div class="ticket-medio-value" id="ticket-medio">R$ 23,47</div>
+                    </div>
+                    
+                    <div class="funnel-stage" data-stage="receita" onclick="highlightChart('receita')">
+                        <div class="stage-header">
+                            <span class="stage-icon">📊</span>
+                            <span class="stage-name">RECEITA</span>
+                        </div>
+                        <div class="stage-data">
+                            <div class="data-item">
+                                <div class="data-label">Realizado</div>
+                                <div class="data-value" id="receita-realizado">R$ 30.000</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Esperado</div>
+                                <div class="data-value" id="receita-esperado">R$ 22.500</div>
+                            </div>
+                        </div>
+                        <div class="data-percentage positive" id="receita-percentage">+33,3%</div>
+                    </div>
+                    
+                </div>
+
+                <div class="charts-column">
+                    
+                    <div class="chart-card" id="chart-leads">
+                        <div class="chart-title">🎯 Evolução MTD - LEADS</div>
+                        <canvas id="chartLeads"></canvas>
+                    </div>
+                    
+                    <div class="chart-card" id="chart-agendados">
+                        <div class="chart-title">📅 Evolução MTD - AGENDADOS</div>
+                        <canvas id="chartAgendados"></canvas>
+                    </div>
+                    
+                    <div class="chart-card" id="chart-reunioes">
+                        <div class="chart-title">🤝 Evolução MTD - REUNIÕES</div>
+                        <canvas id="chartReunioes"></canvas>
+                    </div>
+                    
+                    <div class="chart-card" id="chart-vendas">
+                        <div class="chart-title">💰 Evolução MTD - VENDAS</div>
+                        <canvas id="chartVendas"></canvas>
+                    </div>
+                    
+                    <div class="chart-card" id="chart-receita">
+                        <div class="chart-title">📊 Evolução MTD - RECEITA</div>
+                        <canvas id="chartReceita"></canvas>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <span>Desenvolvida por Mika</span>
+                <span class="heart-icon">💙</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1rWxwh8zHYgX6c47l-5ozaMdmPN6NeQ1n7JFnMko718s/export?format=csv&gid=0';
+        const SENHA_CORRETA = 'borasuri2025';
+        
+        let allData = [];
+        let charts = {};
+        
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (password === SENHA_CORRETA) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                loadData();
+                setInterval(loadData, 60000);
+            } else {
+                errorMsg.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                setTimeout(() => errorMsg.style.display = 'none', 3000);
+            }
+        }
+        
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+        
+        async function loadData() {
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV);
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: false,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        allData = results.data;
+                        processData();
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+        
+        function processData() {
+            const selectedMonth = document.getElementById('monthSelect').value;
+            const [year, month] = selectedMonth.split('-');
+            
+            const today = new Date();
+            const currentDay = today.getDate();
+            
+            const monthData = allData.filter(row => {
+                const dateStr = row[0];
+                if (!dateStr || !dateStr.includes('/')) return false;
+                const [day, monthPart, yearPart] = dateStr.split('/');
+                return yearPart === year && monthPart === month.padStart(2, '0');
+            });
+            
+            if (monthData.length === 0) {
+                console.warn('Nenhum dado encontrado para o mês selecionado');
+                return;
+            }
+            
+            const isCurrentMonth = `${year}-${month}` === `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+            const maxDay = isCurrentMonth ? Math.min(currentDay, monthData.length) : monthData.length;
+            
+            const lastDate = monthData[maxDay - 1][0];
+            document.getElementById('mtdInfo').textContent = `MTD até ${lastDate}`;
+            
+            const labels = [];
+            const leadsEsperado = [], leadsRealizado = [];
+            const agendadosEsperado = [], agendadosRealizado = [];
+            const reunioesEsperado = [], reunioesRealizado = [];
+            const vendasEsperado = [], vendasRealizado = [];
+            const receitaEsperado = [], receitaRealizado = [];
+            
+            for (let i = 0; i < maxDay; i++) {
+                const row = monthData[i];
+                labels.push(row[0].split('/')[0]);
+                
+                leadsEsperado.push(parseFloat(row[1]) || 0);
+                leadsRealizado.push(parseFloat(row[3]) || 0);
+                
+                agendadosEsperado.push(parseFloat(row[5]) || 0);
+                agendadosRealizado.push(parseFloat(row[6]) || 0);
+                
+                reunioesEsperado.push(parseFloat(row[8]) || 0);
+                reunioesRealizado.push(parseFloat(row[9]) || 0);
+                
+                vendasEsperado.push(parseFloat(row[11]) || 0);
+                vendasRealizado.push(parseFloat(row[12]) || 0);
+                
+                const recEsp = (row[14] || '0').replace(/[R$\s.]/g, '').replace(',', '.');
+                const recReal = (row[15] || '0').replace(/[R$\s.]/g, '').replace(',', '.');
+                receitaEsperado.push(parseFloat(recEsp) || 0);
+                receitaRealizado.push(parseFloat(recReal) || 0);
+            }
+            
+            const mtd = {
+                leads: { esperado: leadsEsperado[maxDay - 1], realizado: leadsRealizado[maxDay - 1] },
+                agendados: { esperado: agendadosEsperado[maxDay - 1], realizado: agendadosRealizado[maxDay - 1] },
+                reunioes: { esperado: reunioesEsperado[maxDay - 1], realizado: reunioesRealizado[maxDay - 1] },
+                vendas: { esperado: vendasEsperado[maxDay - 1], realizado: vendasRealizado[maxDay - 1] },
+                receita: { esperado: receitaEsperado[maxDay - 1], realizado: receitaRealizado[maxDay - 1] }
+            };
+            
+            updateCards(mtd);
+            
+            updateCharts(labels, {
+                leads: { esperado: leadsEsperado, realizado: leadsRealizado },
+                agendados: { esperado: agendadosEsperado, realizado: agendadosRealizado },
+                reunioes: { esperado: reunioesEsperado, realizado: reunioesRealizado },
+                vendas: { esperado: vendasEsperado, realizado: vendasRealizado },
+                receita: { esperado: receitaEsperado, realizado: receitaRealizado }
+            });
+        }
+        
+        function updateCards(mtd) {
+            document.getElementById('leads-realizado').textContent = mtd.leads.realizado.toLocaleString('pt-BR');
+            document.getElementById('leads-esperado').textContent = mtd.leads.esperado.toLocaleString('pt-BR');
+            const leadsPerc = ((mtd.leads.realizado / mtd.leads.esperado - 1) * 100).toFixed(1);
+            document.getElementById('leads-percentage').textContent = `${leadsPerc > 0 ? '+' : ''}${leadsPerc}%`;
+            document.getElementById('leads-percentage').className = `data-percentage ${leadsPerc >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('agendados-realizado').textContent = mtd.agendados.realizado.toLocaleString('pt-BR');
+            document.getElementById('agendados-esperado').textContent = mtd.agendados.esperado.toLocaleString('pt-BR');
+            const agendadosPerc = ((mtd.agendados.realizado / mtd.agendados.esperado - 1) * 100).toFixed(1);
+            document.getElementById('agendados-percentage').textContent = `${agendadosPerc > 0 ? '+' : ''}${agendadosPerc}%`;
+            document.getElementById('agendados-percentage').className = `data-percentage ${agendadosPerc >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('reunioes-realizado').textContent = mtd.reunioes.realizado.toLocaleString('pt-BR');
+            document.getElementById('reunioes-esperado').textContent = mtd.reunioes.esperado.toLocaleString('pt-BR');
+            const reunioesPerc = ((mtd.reunioes.realizado / mtd.reunioes.esperado - 1) * 100).toFixed(1);
+            document.getElementById('reunioes-percentage').textContent = `${reunioesPerc > 0 ? '+' : ''}${reunioesPerc}%`;
+            document.getElementById('reunioes-percentage').className = `data-percentage ${reunioesPerc >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('vendas-realizado').textContent = mtd.vendas.realizado.toLocaleString('pt-BR');
+            document.getElementById('vendas-esperado').textContent = mtd.vendas.esperado.toLocaleString('pt-BR');
+            const vendasPerc = ((mtd.vendas.realizado / mtd.vendas.esperado - 1) * 100).toFixed(1);
+            document.getElementById('vendas-percentage').textContent = `${vendasPerc > 0 ? '+' : ''}${vendasPerc}%`;
+            document.getElementById('vendas-percentage').className = `data-percentage ${vendasPerc >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('receita-realizado').textContent = `R$ ${mtd.receita.realizado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('receita-esperado').textContent = `R$ ${mtd.receita.esperado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            const receitaPerc = ((mtd.receita.realizado / mtd.receita.esperado - 1) * 100).toFixed(1);
+            document.getElementById('receita-percentage').textContent = `${receitaPerc > 0 ? '+' : ''}${receitaPerc}%`;
+            document.getElementById('receita-percentage').className = `data-percentage ${receitaPerc >= 0 ? 'positive' : 'negative'}`;
+            
+            const convLeadsAgendados = (mtd.agendados.realizado / mtd.leads.realizado * 100).toFixed(1);
+            document.getElementById('conv-leads-agendados').textContent = `${convLeadsAgendados}%`;
+            
+            const convAgendadosReunioes = (mtd.reunioes.realizado / mtd.agendados.realizado * 100).toFixed(1);
+            document.getElementById('conv-agendados-reunioes').textContent = `${convAgendadosReunioes}%`;
+            
+            const convReunioesVendas = (mtd.vendas.realizado / mtd.reunioes.realizado * 100).toFixed(1);
+            document.getElementById('conv-reunioes-vendas').textContent = `${convReunioesVendas}%`;
+            
+            const ticketMedio = mtd.receita.realizado / mtd.vendas.realizado;
+            document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+        
+        function updateCharts(labels, data) {
+            const stages = ['leads', 'agendados', 'reunioes', 'vendas', 'receita'];
+            const colors = {
+                leads: '#FFD93D',
+                agendados: '#5B68F5',
+                reunioes: '#A64DFF',
+                vendas: '#FF6BBF',
+                receita: '#5FC88F'
+            };
+            
+            stages.forEach(stage => {
+                const ctx = document.getElementById(`chart${stage.charAt(0).toUpperCase() + stage.slice(1)}`).getContext('2d');
+                
+                if (charts[stage]) {
+                    charts[stage].destroy();
+                }
+                
+                const isReceita = stage === 'receita';
+                
+                charts[stage] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Esperado',
+                                data: data[stage].esperado,
+                                borderColor: '#95A5A6',
+                                backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Realizado',
+                                data: data[stage].realizado,
+                                borderColor: colors[stage],
+                                backgroundColor: `${colors[stage]}33`,
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: (context) => {
+                                        let label = context.dataset.label || '';
+                                        if (label) label += ': ';
+                                        if (isReceita) {
+                                            label += 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                        } else {
+                                            label += context.parsed.y.toLocaleString('pt-BR');
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: (value) => {
+                                        if (isReceita) {
+                                            return 'R$ ' + value.toLocaleString('pt-BR');
+                                        }
+                                        return value.toLocaleString('pt-BR');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        function highlightChart(stage) {
+            document.querySelectorAll('.chart-card').forEach(card => card.classList.remove('highlight'));
+            document.querySelectorAll('.funnel-stage').forEach(s => s.classList.remove('active'));
+            
+            document.getElementById(`chart-${stage}`).classList.add('highlight');
+            document.querySelector(`[data-stage="${stage}"]`).classList.add('active');
+            
+            document.getElementById(`chart-${stage}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9a4bfe852ca6f18d","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.9.1","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDsdHQi8TtJNKWvDspBqqmC%2BzKFI38ydnFSixtQNAB%2F%2F22leJ4Yc%2F4p9cPO2552IcbgU2WGiW%2FdaqGG8MK61OqLDyBKht77UTEtl4t1FbE6fsc5YfrmeafeElMqK2MExeBdyXIj51pTpYtF4smByxeE3rouUI73qI8WGTxFee%2Fm%2BNk%2BlgcJP%2B5ga61EaeXmNGVNLVDDIs0EqgXBXaNr1EfGdDV%2F%2BpHLK6fUvWVeT%2FsknKJ9bB7UeALisNiVEotmbev39RLsZ78V68oaMro1k7KHXUCXiBmrQjXXIyJuWUZEPhL58oSPKYGSFTQBABsOjeio1Iq1RKzrxUlhSkIsbWYzhPu8z7jvtVSgHqXok0mg6BUw%2F8GL1RXAwp71dd6iRXM9TpivCRj6sypVG%2FV3DkD4F21TMV4Xl4VPAaew2ojaESWvknI6YPbBAds6vge%2Fhmyeemc%2Bwz3OIyMPdHK5oeg%2B3OrFSKtYbhN8DgzDV14PLurSLo%2FUrHMtfMV9MYolLVc0D0Rhfa6ZQ70VV4a3kfMrTv6dhT%2FUByIr%2F3T2EH%2B44keSUcjiUbjE8BMyXsNlkKaKNsj%2BaATdn7EU1NF3jjI4Vypg9Ca4%2FFi2IYgbf0dgXk";
+        window.__genspark_locale = "pt-BR";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDsdHQi8TtJNKWvDspBqqmC+zKFI38ydnFSixtQNAB//22leJ4Yc/4p9cPO2552IcbgU2WGiW/daqGG8MK61OqLDyBKht77UTEtl4t1FbE6fsc5YfrmeafeElMqK2MExeBdyXIj51pTpYtF4smByxeE3rouUI73qI8WGTxFee/m+Nk+lgcJP+5ga61EaeXmNGVNLVDDIs0EqgXBXaNr1EfGdDV/+pHLK6fUvWVeT/sknKJ9bB7UeALisNiVEotmbev39RLsZ78V68oaMro1k7KHXUCXiBmrQjXXIyJuWUZEPhL58oSPKYGSFTQBABsOjeio1Iq1RKzrxUlhSkIsbWYzhPu8z7jvtVSgHqXok0mg6BUw/8GL1RXAwp71dd6iRXM9TpivCRj6sypVG/V3DkD4F21TMV4Xl4VPAaew2ojaESWvknI6YPbBAds6vge/hmyeemc+wz3OIyMPdHK5oeg+3OrFSKtYbhN8DgzDV14PLurSLo/UrHMtfMV9MYolLVc0D0Rhfa6ZQ70VV4a3kfMrTv6dhT/UByIr/3T2EH+44keSUcjiUbjE8BMyXsNlkKaKNsj+aATdn7EU1NF3jjI4Vypg9Ca4/Fi2IYgbf0dgXk";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
