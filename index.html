@@ -1,19 +1,12 @@
-index(12).html
-
-Rendered HTML
-
-Download
-Copy<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard MTD Suri - Funil de Vendas</title>
-    
+    <title>Suri Dashboard MTD</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
@@ -31,7 +24,6 @@ Copy<!DOCTYPE html>
             --suri-yellow: #FFD93D;
             --suri-purple: #A64DFF;
             --suri-pink: #FF6BBF;
-            --suri-gold: #FFB84D;
             --bg-primary: #F8F9FC;
             --bg-secondary: #FFFFFF;
             --text-primary: #2C3E50;
@@ -47,7 +39,7 @@ Copy<!DOCTYPE html>
             overflow: hidden;
         }
         
-        #loginScreen {
+        #login-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -127,7 +119,7 @@ Copy<!DOCTYPE html>
             display: none;
         }
         
-        #dashboardContent {
+        #dashboard-content {
             display: none;
             height: 100vh;
             overflow: hidden;
@@ -186,7 +178,7 @@ Copy<!DOCTYPE html>
             font-weight: 500;
         }
         
-        #monthSelect {
+        #month-selector {
             padding: 0.6rem 1.2rem;
             border: 2px solid var(--border-color);
             border-radius: 10px;
@@ -198,11 +190,11 @@ Copy<!DOCTYPE html>
             transition: all 0.3s;
         }
         
-        #monthSelect:hover {
+        #month-selector:hover {
             border-color: var(--suri-blue);
         }
         
-        #monthSelect:focus {
+        #month-selector:focus {
             outline: none;
             border-color: var(--suri-blue);
             box-shadow: 0 0 0 4px rgba(91, 104, 245, 0.1);
@@ -453,47 +445,34 @@ Copy<!DOCTYPE html>
 </head>
 <body>
 
-    <div id="loginScreen">
+    <div id="login-screen">
         <div class="login-box">
             <h2>Dashboard MTD Suri</h2>
             <p>Digite a senha para acessar</p>
             <input 
                 type="password" 
-                id="passwordInput" 
+                id="password-input" 
                 class="login-input" 
                 placeholder="Digite a senha..."
                 autocomplete="off"
             >
             <button onclick="checkPassword()" class="login-btn">Entrar</button>
-            <div id="errorMessage" class="error-message">Senha incorreta. Tente novamente.</div>
+            <div id="error-message" class="error-message">Senha incorreta. Tente novamente.</div>
         </div>
     </div>
 
-    <div id="dashboardContent">
+    <div id="dashboard-content">
         <header class="header">
             <div class="header-left">
                 <img src="https://www.genspark.ai/api/files/s/rKZUMQt4" alt="Logo Suri" class="logo-suri">
                 <div class="header-title">
                     <h1>Suri Dashboard MTD</h1>
-                    <span class="mtd-info" id="mtdInfo">MTD até 26/11/2025</span>
+                    <span class="mtd-info" id="current-month">MTD até 08/12/2025</span>
                 </div>
             </div>
             <div class="month-selector">
-                <label for="monthSelect">Mês:</label>
-                <select id="monthSelect" onchange="loadData()">
-                    <option value="2025-01">Janeiro 2025</option>
-                    <option value="2025-02">Fevereiro 2025</option>
-                    <option value="2025-03">Março 2025</option>
-                    <option value="2025-04">Abril 2025</option>
-                    <option value="2025-05">Maio 2025</option>
-                    <option value="2025-06">Junho 2025</option>
-                    <option value="2025-07">Julho 2025</option>
-                    <option value="2025-08">Agosto 2025</option>
-                    <option value="2025-09">Setembro 2025</option>
-                    <option value="2025-10">Outubro 2025</option>
-                    <option value="2025-11" selected>Novembro 2025</option>
-                    <option value="2025-12">Dezembro 2025</option>
-                </select>
+                <label for="month-selector">Mês:</label>
+                <select id="month-selector"></select>
             </div>
         </header>
 
@@ -510,19 +489,19 @@ Copy<!DOCTYPE html>
                         <div class="stage-data">
                             <div class="data-item">
                                 <div class="data-label">Realizado</div>
-                                <div class="data-value" id="leads-realizado">1.278</div>
+                                <div class="data-value" id="leads-realizado">0</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Esperado</div>
-                                <div class="data-value" id="leads-esperado">1.820</div>
+                                <div class="data-value" id="leads-esperado">0</div>
                             </div>
                         </div>
-                        <div class="data-percentage negative" id="leads-percentage">-29,8%</div>
+                        <div class="data-percentage negative" id="leads-percent">0%</div>
                     </div>
                     
                     <div class="conversion-badge">
                         <div class="conversion-label">↓ Conversão</div>
-                        <div class="conversion-value" id="conv-leads-agendados">89,2%</div>
+                        <div class="conversion-value" id="conv-leads-agendados">0%</div>
                     </div>
                     
                     <div class="funnel-stage" data-stage="agendados" onclick="highlightChart('agendados')">
@@ -533,19 +512,19 @@ Copy<!DOCTYPE html>
                         <div class="stage-data">
                             <div class="data-item">
                                 <div class="data-label">Realizado</div>
-                                <div class="data-value" id="agendados-realizado">1.140</div>
+                                <div class="data-value" id="agendados-realizado">0</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Esperado</div>
-                                <div class="data-value" id="agendados-esperado">1.620</div>
+                                <div class="data-value" id="agendados-esperado">0</div>
                             </div>
                         </div>
-                        <div class="data-percentage negative" id="agendados-percentage">-29,6%</div>
+                        <div class="data-percentage negative" id="agendados-percent">0%</div>
                     </div>
                     
                     <div class="conversion-badge">
                         <div class="conversion-label">↓ Conversão</div>
-                        <div class="conversion-value" id="conv-agendados-reunioes">112,1%</div>
+                        <div class="conversion-value" id="conv-agendados-reunioes">0%</div>
                     </div>
                     
                     <div class="funnel-stage" data-stage="reunioes" onclick="highlightChart('reunioes')">
@@ -556,19 +535,19 @@ Copy<!DOCTYPE html>
                         <div class="stage-data">
                             <div class="data-item">
                                 <div class="data-label">Realizado</div>
-                                <div class="data-value" id="reunioes-realizado">1.278</div>
+                                <div class="data-value" id="reunioes-realizado">0</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Esperado</div>
-                                <div class="data-value" id="reunioes-esperado">1.595</div>
+                                <div class="data-value" id="reunioes-esperado">0</div>
                             </div>
                         </div>
-                        <div class="data-percentage negative" id="reunioes-percentage">-19,9%</div>
+                        <div class="data-percentage negative" id="reunioes-percent">0%</div>
                     </div>
                     
                     <div class="conversion-badge">
                         <div class="conversion-label">↓ Conversão</div>
-                        <div class="conversion-value" id="conv-reunioes-vendas">100,0%</div>
+                        <div class="conversion-value" id="conv-reunioes-vendas">0%</div>
                     </div>
                     
                     <div class="funnel-stage" data-stage="vendas" onclick="highlightChart('vendas')">
@@ -579,19 +558,19 @@ Copy<!DOCTYPE html>
                         <div class="stage-data">
                             <div class="data-item">
                                 <div class="data-label">Realizado</div>
-                                <div class="data-value" id="vendas-realizado">1.278</div>
+                                <div class="data-value" id="vendas-realizado">0</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Esperado</div>
-                                <div class="data-value" id="vendas-esperado">1.585</div>
+                                <div class="data-value" id="vendas-esperado">0</div>
                             </div>
                         </div>
-                        <div class="data-percentage negative" id="vendas-percentage">-19,4%</div>
+                        <div class="data-percentage negative" id="vendas-percent">0%</div>
                     </div>
                     
                     <div class="ticket-medio-badge">
                         <div class="ticket-medio-label">💵 Ticket Médio</div>
-                        <div class="ticket-medio-value" id="ticket-medio">R$ 23,47</div>
+                        <div class="ticket-medio-value" id="ticket-medio">R$ 0</div>
                     </div>
                     
                     <div class="funnel-stage" data-stage="receita" onclick="highlightChart('receita')">
@@ -602,43 +581,43 @@ Copy<!DOCTYPE html>
                         <div class="stage-data">
                             <div class="data-item">
                                 <div class="data-label">Realizado</div>
-                                <div class="data-value" id="receita-realizado">R$ 30.000</div>
+                                <div class="data-value" id="receita-realizado">R$ 0</div>
                             </div>
                             <div class="data-item">
                                 <div class="data-label">Esperado</div>
-                                <div class="data-value" id="receita-esperado">R$ 22.500</div>
+                                <div class="data-value" id="receita-esperado">R$ 0</div>
                             </div>
                         </div>
-                        <div class="data-percentage positive" id="receita-percentage">+33,3%</div>
+                        <div class="data-percentage positive" id="receita-percent">0%</div>
                     </div>
                     
                 </div>
 
                 <div class="charts-column">
                     
-                    <div class="chart-card" id="chart-leads">
+                    <div class="chart-card" id="chart-leads-card">
                         <div class="chart-title">🎯 Evolução MTD - LEADS</div>
-                        <canvas id="chartLeads"></canvas>
+                        <canvas id="chart-leads"></canvas>
                     </div>
                     
-                    <div class="chart-card" id="chart-agendados">
+                    <div class="chart-card" id="chart-agendados-card">
                         <div class="chart-title">📅 Evolução MTD - AGENDADOS</div>
-                        <canvas id="chartAgendados"></canvas>
+                        <canvas id="chart-agendados"></canvas>
                     </div>
                     
-                    <div class="chart-card" id="chart-reunioes">
+                    <div class="chart-card" id="chart-reunioes-card">
                         <div class="chart-title">🤝 Evolução MTD - REUNIÕES</div>
-                        <canvas id="chartReunioes"></canvas>
+                        <canvas id="chart-reunioes"></canvas>
                     </div>
                     
-                    <div class="chart-card" id="chart-vendas">
+                    <div class="chart-card" id="chart-vendas-card">
                         <div class="chart-title">💰 Evolução MTD - VENDAS</div>
-                        <canvas id="chartVendas"></canvas>
+                        <canvas id="chart-vendas"></canvas>
                     </div>
                     
-                    <div class="chart-card" id="chart-receita">
+                    <div class="chart-card" id="chart-receita-card">
                         <div class="chart-title">📊 Evolução MTD - RECEITA</div>
-                        <canvas id="chartReceita"></canvas>
+                        <canvas id="chart-receita"></canvas>
                     </div>
                     
                 </div>
@@ -648,7 +627,7 @@ Copy<!DOCTYPE html>
 
         <footer class="footer">
             <div class="footer-content">
-                <span>Desenvolvido por Mika</span>
+                <span>Desenvolvida por Mika</span>
                 <span class="heart-icon">💙</span>
             </div>
         </footer>
@@ -656,274 +635,504 @@ Copy<!DOCTYPE html>
     </div>
 
     <script>
-        const GOOGLE_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1rWxwh8zHYgX6c47l-5ozaMdmPN6NeQ1n7JFnMko718s/export?format=csv&gid=0';
-        const SENHA_CORRETA = 'borasuri2025';
-        
-        let allData = [];
-        let charts = {};
-        
-        function checkPassword() {
-            const password = document.getElementById('passwordInput').value;
-            const errorMsg = document.getElementById('errorMessage');
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1rWxwh8zHYgX6c47l-5ozaMdmPN6NeQ1n7JFnMko718s/export?format=csv&gid=0';
+        const PASSWORD = 'borasuri2025';
+
+        function parseSheetDate(dateStr) {
+            if (!dateStr || typeof dateStr !== 'string') return null;
+            const parts = dateStr.trim().split('/');
+            if (parts.length !== 3) return null;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+            return new Date(year, month, day);
+        }
+
+        function cleanNumericValue(val) {
+            if (val === null || val === undefined || val === '') return 0;
+            if (typeof val === 'number') return val;
+            const str = String(val).trim();
+            if (str === '#DIV/0!' || str === '#N/A' || str === '#VALUE!' || str === '#REF!') return 0;
+            const cleaned = str.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function groupRowsByMonth(rows) {
+            const monthMap = {};
             
-            if (password === SENHA_CORRETA) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'block';
+            rows.forEach(row => {
+                if (!row || row.length < 2) return;
+                const dateObj = parseSheetDate(row[0]);
+                if (!dateObj) return;
+                
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const monthKey = `${year}-${month}`;
+                
+                if (!monthMap[monthKey]) monthMap[monthKey] = [];
+                monthMap[monthKey].push({
+                    date: dateObj,
+                    row: row
+                });
+            });
+            
+            return monthMap;
+        }
+
+        function getDefaultMonthKey(monthMap) {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+            const currentKey = `${currentYear}-${currentMonth}`;
+            
+            if (monthMap[currentKey] && monthMap[currentKey].length > 0) {
+                return currentKey;
+            }
+            
+            const keys = Object.keys(monthMap).sort().reverse();
+            return keys.length > 0 ? keys[0] : currentKey;
+        }
+
+        function computeMTDForMonth(monthData) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const result = {
+                labels: [],
+                leadsEsperado: [],
+                agendadosEsperado: [],
+                reunioesEsperado: [],
+                vendasEsperado: [],
+                receitaEsperado: [],
+                leadsRealizado: [],
+                agendadosRealizado: [],
+                reunioesRealizado: [],
+                vendasRealizado: [],
+                receitaRealizado: [],
+                mtd: {
+                    leads: { meta: 0, realizado: 0 },
+                    agendados: { meta: 0, realizado: 0 },
+                    reunioes: { meta: 0, realizado: 0 },
+                    vendas: { meta: 0, realizado: 0 },
+                    receita: { meta: 0, realizado: 0 }
+                }
+            };
+            
+            monthData.sort((a, b) => a.date - b.date);
+            
+            monthData.forEach(item => {
+                const { date, row } = item;
+                
+                if (date > today) return;
+                
+                const day = date.getDate();
+                result.labels.push(day);
+                
+                const leadsEsp = cleanNumericValue(row[1]);
+                const agendadosEsp = cleanNumericValue(row[5]);
+                const reunioesEsp = cleanNumericValue(row[9]);
+                const vendasEsp = cleanNumericValue(row[13]);
+                const receitaEsp = cleanNumericValue(row[17]);
+                
+                result.leadsEsperado.push(leadsEsp);
+                result.agendadosEsperado.push(agendadosEsp);
+                result.reunioesEsperado.push(reunioesEsp);
+                result.vendasEsperado.push(vendasEsp);
+                result.receitaEsperado.push(receitaEsp);
+                
+                const leadsReal = cleanNumericValue(row[3]);
+                const agendadosReal = cleanNumericValue(row[7]);
+                const reunioesReal = cleanNumericValue(row[11]);
+                const vendasReal = cleanNumericValue(row[15]);
+                const receitaReal = cleanNumericValue(row[19]);
+                
+                result.leadsRealizado.push(leadsReal);
+                result.agendadosRealizado.push(agendadosReal);
+                result.reunioesRealizado.push(reunioesReal);
+                result.vendasRealizado.push(vendasReal);
+                result.receitaRealizado.push(receitaReal);
+                
+                result.mtd.leads.meta = leadsEsp;
+                result.mtd.leads.realizado = leadsReal;
+                result.mtd.agendados.meta = agendadosEsp;
+                result.mtd.agendados.realizado = agendadosReal;
+                result.mtd.reunioes.meta = reunioesEsp;
+                result.mtd.reunioes.realizado = reunioesReal;
+                result.mtd.vendas.meta = vendasEsp;
+                result.mtd.vendas.realizado = vendasReal;
+                result.mtd.receita.meta = receitaEsp;
+                result.mtd.receita.realizado = receitaReal;
+            });
+            
+            return result;
+        }
+
+        function calcPercentDeviation(realizado, meta) {
+            if (meta === 0) {
+                return realizado === 0 ? 0 : 100;
+            }
+            return ((realizado / meta) - 1) * 100;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        let allMonthsData = {};
+        let currentMonthKey = '';
+
+        function loadData() {
+            Papa.parse(SHEET_URL, {
+                download: true,
+                complete: function(results) {
+                    const rows = results.data.slice(1);
+                    
+                    allMonthsData = groupRowsByMonth(rows);
+                    
+                    currentMonthKey = getDefaultMonthKey(allMonthsData);
+                    
+                    populateMonthSelector();
+                    
+                    processCurrentMonth();
+                },
+                error: function(error) {
+                    console.error('Erro ao carregar dados:', error);
+                    alert('Erro ao carregar dados da planilha. Verifique a conexão.');
+                }
+            });
+        }
+
+        function populateMonthSelector() {
+            const selector = document.getElementById('month-selector');
+            selector.innerHTML = '';
+            
+            const monthNames = {
+                '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril',
+                '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto',
+                '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+            };
+            
+            const sortedKeys = Object.keys(allMonthsData).sort().reverse();
+            
+            sortedKeys.forEach(key => {
+                const [year, month] = key.split('-');
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${monthNames[month]} ${year}`;
+                
+                if (key === currentMonthKey) {
+                    option.selected = true;
+                }
+                
+                selector.appendChild(option);
+            });
+            
+            selector.addEventListener('change', function() {
+                currentMonthKey = this.value;
+                processCurrentMonth();
+            });
+        }
+
+        function processCurrentMonth() {
+            if (!allMonthsData[currentMonthKey]) {
+                console.error('Mês não encontrado:', currentMonthKey);
+                return;
+            }
+            
+            const monthData = allMonthsData[currentMonthKey];
+            const mtdData = computeMTDForMonth(monthData);
+            
+            updateDashboard(mtdData);
+        }
+
+        function updateDashboard(data) {
+            const mtd = data.mtd;
+            
+            document.getElementById('leads-realizado').textContent = formatNumber(mtd.leads.realizado);
+            document.getElementById('leads-esperado').textContent = formatNumber(mtd.leads.meta);
+            const leadsPerc = calcPercentDeviation(mtd.leads.realizado, mtd.leads.meta);
+            document.getElementById('leads-percent').textContent = (leadsPerc >= 0 ? '+' : '') + leadsPerc.toFixed(1) + '%';
+            document.getElementById('leads-percent').className = 'data-percentage ' + (leadsPerc >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('agendados-realizado').textContent = formatNumber(mtd.agendados.realizado);
+            document.getElementById('agendados-esperado').textContent = formatNumber(mtd.agendados.meta);
+            const agendadosPerc = calcPercentDeviation(mtd.agendados.realizado, mtd.agendados.meta);
+            document.getElementById('agendados-percent').textContent = (agendadosPerc >= 0 ? '+' : '') + agendadosPerc.toFixed(1) + '%';
+            document.getElementById('agendados-percent').className = 'data-percentage ' + (agendadosPerc >= 0 ? 'positive' : 'negative');
+            
+            const convLeadsAgend = mtd.leads.realizado > 0 ? (mtd.agendados.realizado / mtd.leads.realizado * 100) : 0;
+            document.getElementById('conv-leads-agendados').textContent = convLeadsAgend.toFixed(1) + '%';
+            
+            document.getElementById('reunioes-realizado').textContent = formatNumber(mtd.reunioes.realizado);
+            document.getElementById('reunioes-esperado').textContent = formatNumber(mtd.reunioes.meta);
+            const reunioesPerc = calcPercentDeviation(mtd.reunioes.realizado, mtd.reunioes.meta);
+            document.getElementById('reunioes-percent').textContent = (reunioesPerc >= 0 ? '+' : '') + reunioesPerc.toFixed(1) + '%';
+            document.getElementById('reunioes-percent').className = 'data-percentage ' + (reunioesPerc >= 0 ? 'positive' : 'negative');
+            
+            const convAgendReun = mtd.agendados.realizado > 0 ? (mtd.reunioes.realizado / mtd.agendados.realizado * 100) : 0;
+            document.getElementById('conv-agendados-reunioes').textContent = convAgendReun.toFixed(1) + '%';
+            
+            document.getElementById('vendas-realizado').textContent = formatNumber(mtd.vendas.realizado);
+            document.getElementById('vendas-esperado').textContent = formatNumber(mtd.vendas.meta);
+            const vendasPerc = calcPercentDeviation(mtd.vendas.realizado, mtd.vendas.meta);
+            document.getElementById('vendas-percent').textContent = (vendasPerc >= 0 ? '+' : '') + vendasPerc.toFixed(1) + '%';
+            document.getElementById('vendas-percent').className = 'data-percentage ' + (vendasPerc >= 0 ? 'positive' : 'negative');
+            
+            const convReunVendas = mtd.reunioes.realizado > 0 ? (mtd.vendas.realizado / mtd.reunioes.realizado * 100) : 0;
+            document.getElementById('conv-reunioes-vendas').textContent = convReunVendas.toFixed(1) + '%';
+            
+            document.getElementById('receita-realizado').textContent = formatCurrency(mtd.receita.realizado);
+            document.getElementById('receita-esperado').textContent = formatCurrency(mtd.receita.meta);
+            const receitaPerc = calcPercentDeviation(mtd.receita.realizado, mtd.receita.meta);
+            document.getElementById('receita-percent').textContent = (receitaPerc >= 0 ? '+' : '') + receitaPerc.toFixed(1) + '%';
+            document.getElementById('receita-percent').className = 'data-percentage ' + (receitaPerc >= 0 ? 'positive' : 'negative');
+            
+            const ticketMedio = mtd.vendas.realizado > 0 ? (mtd.receita.realizado / mtd.vendas.realizado) : 0;
+            document.getElementById('ticket-medio').textContent = formatCurrency(ticketMedio);
+            
+            const today = new Date();
+            const [year, month] = currentMonthKey.split('-');
+            document.getElementById('current-month').textContent = `MTD até ${today.getDate()}/${month}/${year}`;
+            
+            updateCharts(data);
+        }
+
+        let chartInstances = {
+            leads: null,
+            agendados: null,
+            reunioes: null,
+            vendas: null,
+            receita: null
+        };
+
+        function updateCharts(data) {
+            const chartConfig = {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+            
+            if (chartInstances.leads) chartInstances.leads.destroy();
+            chartInstances.leads = new Chart(document.getElementById('chart-leads'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Esperado',
+                            data: data.leadsEsperado,
+                            borderColor: '#95A5A6',
+                            backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Realizado',
+                            data: data.leadsRealizado,
+                            borderColor: '#FFD93D',
+                            backgroundColor: 'rgba(255, 217, 61, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: chartConfig.options
+            });
+            
+            if (chartInstances.agendados) chartInstances.agendados.destroy();
+            chartInstances.agendados = new Chart(document.getElementById('chart-agendados'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Esperado',
+                            data: data.agendadosEsperado,
+                            borderColor: '#95A5A6',
+                            backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Realizado',
+                            data: data.agendadosRealizado,
+                            borderColor: '#5B68F5',
+                            backgroundColor: 'rgba(91, 104, 245, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: chartConfig.options
+            });
+            
+            if (chartInstances.reunioes) chartInstances.reunioes.destroy();
+            chartInstances.reunioes = new Chart(document.getElementById('chart-reunioes'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Esperado',
+                            data: data.reunioesEsperado,
+                            borderColor: '#95A5A6',
+                            backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Realizado',
+                            data: data.reunioesRealizado,
+                            borderColor: '#A64DFF',
+                            backgroundColor: 'rgba(166, 77, 255, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: chartConfig.options
+            });
+            
+            if (chartInstances.vendas) chartInstances.vendas.destroy();
+            chartInstances.vendas = new Chart(document.getElementById('chart-vendas'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Esperado',
+                            data: data.vendasEsperado,
+                            borderColor: '#95A5A6',
+                            backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Realizado',
+                            data: data.vendasRealizado,
+                            borderColor: '#FF6BBF',
+                            backgroundColor: 'rgba(255, 107, 191, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: chartConfig.options
+            });
+            
+            if (chartInstances.receita) chartInstances.receita.destroy();
+            chartInstances.receita = new Chart(document.getElementById('chart-receita'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Esperado',
+                            data: data.receitaEsperado,
+                            borderColor: '#95A5A6',
+                            backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Realizado',
+                            data: data.receitaRealizado,
+                            borderColor: '#5FC88F',
+                            backgroundColor: 'rgba(95, 200, 143, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: chartConfig.options
+            });
+        }
+
+        function checkPassword() {
+            const inputPassword = document.getElementById('password-input').value;
+            const errorMsg = document.getElementById('error-message');
+            
+            if (inputPassword === PASSWORD) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
                 loadData();
                 setInterval(loadData, 60000);
             } else {
                 errorMsg.style.display = 'block';
-                document.getElementById('passwordInput').value = '';
+                document.getElementById('password-input').value = '';
                 setTimeout(() => errorMsg.style.display = 'none', 3000);
             }
         }
-        
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkPassword();
-        });
-        
-        async function loadData() {
-            try {
-                const response = await fetch(GOOGLE_SHEET_CSV);
-                const csvText = await response.text();
-                
-                Papa.parse(csvText, {
-                    header: false,
-                    skipEmptyLines: true,
-                    complete: (results) => {
-                        allData = results.data;
-                        processData();
-                    }
-                });
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-            }
-        }
-        
-        function processData() {
-            const selectedMonth = document.getElementById('monthSelect').value;
-            const [year, month] = selectedMonth.split('-');
-            
-            const today = new Date();
-            const currentDay = today.getDate();
-            
-            const monthData = allData.filter(row => {
-                const dateStr = row[0];
-                if (!dateStr || !dateStr.includes('/')) return false;
-                const [day, monthPart, yearPart] = dateStr.split('/');
-                return yearPart === year && monthPart === month.padStart(2, '0');
-            });
-            
-            if (monthData.length === 0) {
-                console.warn('Nenhum dado encontrado para o mês selecionado');
-                return;
-            }
-            
-            const isCurrentMonth = `${year}-${month}` === `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
-            const maxDay = isCurrentMonth ? Math.min(currentDay, monthData.length) : monthData.length;
-            
-            const lastDate = monthData[maxDay - 1][0];
-            document.getElementById('mtdInfo').textContent = `MTD até ${lastDate}`;
-            
-            const labels = [];
-            const leadsEsperado = [], leadsRealizado = [];
-            const agendadosEsperado = [], agendadosRealizado = [];
-            const reunioesEsperado = [], reunioesRealizado = [];
-            const vendasEsperado = [], vendasRealizado = [];
-            const receitaEsperado = [], receitaRealizado = [];
-            
-            for (let i = 0; i < maxDay; i++) {
-                const row = monthData[i];
-                labels.push(row[0].split('/')[0]);
-                
-                leadsEsperado.push(parseFloat(row[1]) || 0);
-                leadsRealizado.push(parseFloat(row[3]) || 0);
-                
-                agendadosEsperado.push(parseFloat(row[5]) || 0);
-                agendadosRealizado.push(parseFloat(row[7]) || 0);
-                
-                reunioesEsperado.push(parseFloat(row[9]) || 0);
-                reunioesRealizado.push(parseFloat(row[11]) || 0);
-                
-                vendasEsperado.push(parseFloat(row[13]) || 0);
-                vendasRealizado.push(parseFloat(row[15]) || 0);
-                
-                const recEsp = (row[17] || '0').replace(/[R$\s.]/g, '').replace(',', '.');
-                const recReal = (row[19] || '0').replace(/[R$\s.]/g, '').replace(',', '.');
-                receitaEsperado.push(parseFloat(recEsp) || 0);
-                receitaRealizado.push(parseFloat(recReal) || 0);
-            }
-            
-            const mtd = {
-                leads: { esperado: leadsEsperado[maxDay - 1], realizado: leadsRealizado[maxDay - 1] },
-                agendados: { esperado: agendadosEsperado[maxDay - 1], realizado: agendadosRealizado[maxDay - 1] },
-                reunioes: { esperado: reunioesEsperado[maxDay - 1], realizado: reunioesRealizado[maxDay - 1] },
-                vendas: { esperado: vendasEsperado[maxDay - 1], realizado: vendasRealizado[maxDay - 1] },
-                receita: { esperado: receitaEsperado[maxDay - 1], realizado: receitaRealizado[maxDay - 1] }
-            };
-            
-            updateCards(mtd);
-            
-            updateCharts(labels, {
-                leads: { esperado: leadsEsperado, realizado: leadsRealizado },
-                agendados: { esperado: agendadosEsperado, realizado: agendadosRealizado },
-                reunioes: { esperado: reunioesEsperado, realizado: reunioesRealizado },
-                vendas: { esperado: vendasEsperado, realizado: vendasRealizado },
-                receita: { esperado: receitaEsperado, realizado: receitaRealizado }
-            });
-        }
-        
-        function updateCards(mtd) {
-            document.getElementById('leads-realizado').textContent = mtd.leads.realizado.toLocaleString('pt-BR');
-            document.getElementById('leads-esperado').textContent = mtd.leads.esperado.toLocaleString('pt-BR');
-            const leadsPerc = ((mtd.leads.realizado / mtd.leads.esperado - 1) * 100).toFixed(1);
-            document.getElementById('leads-percentage').textContent = `${leadsPerc > 0 ? '+' : ''}${leadsPerc}%`;
-            document.getElementById('leads-percentage').className = `data-percentage ${leadsPerc >= 0 ? 'positive' : 'negative'}`;
-            
-            document.getElementById('agendados-realizado').textContent = mtd.agendados.realizado.toLocaleString('pt-BR');
-            document.getElementById('agendados-esperado').textContent = mtd.agendados.esperado.toLocaleString('pt-BR');
-            const agendadosPerc = ((mtd.agendados.realizado / mtd.agendados.esperado - 1) * 100).toFixed(1);
-            document.getElementById('agendados-percentage').textContent = `${agendadosPerc > 0 ? '+' : ''}${agendadosPerc}%`;
-            document.getElementById('agendados-percentage').className = `data-percentage ${agendadosPerc >= 0 ? 'positive' : 'negative'}`;
-            
-            document.getElementById('reunioes-realizado').textContent = mtd.reunioes.realizado.toLocaleString('pt-BR');
-            document.getElementById('reunioes-esperado').textContent = mtd.reunioes.esperado.toLocaleString('pt-BR');
-            const reunioesPerc = ((mtd.reunioes.realizado / mtd.reunioes.esperado - 1) * 100).toFixed(1);
-            document.getElementById('reunioes-percentage').textContent = `${reunioesPerc > 0 ? '+' : ''}${reunioesPerc}%`;
-            document.getElementById('reunioes-percentage').className = `data-percentage ${reunioesPerc >= 0 ? 'positive' : 'negative'}`;
-            
-            document.getElementById('vendas-realizado').textContent = mtd.vendas.realizado.toLocaleString('pt-BR');
-            document.getElementById('vendas-esperado').textContent = mtd.vendas.esperado.toLocaleString('pt-BR');
-            const vendasPerc = ((mtd.vendas.realizado / mtd.vendas.esperado - 1) * 100).toFixed(1);
-            document.getElementById('vendas-percentage').textContent = `${vendasPerc > 0 ? '+' : ''}${vendasPerc}%`;
-            document.getElementById('vendas-percentage').className = `data-percentage ${vendasPerc >= 0 ? 'positive' : 'negative'}`;
-            
-            document.getElementById('receita-realizado').textContent = `R$ ${mtd.receita.realizado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('receita-esperado').textContent = `R$ ${mtd.receita.esperado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            const receitaPerc = ((mtd.receita.realizado / mtd.receita.esperado - 1) * 100).toFixed(1);
-            document.getElementById('receita-percentage').textContent = `${receitaPerc > 0 ? '+' : ''}${receitaPerc}%`;
-            document.getElementById('receita-percentage').className = `data-percentage ${receitaPerc >= 0 ? 'positive' : 'negative'}`;
-            
-            const convLeadsAgendados = (mtd.agendados.realizado / mtd.leads.realizado * 100).toFixed(1);
-            document.getElementById('conv-leads-agendados').textContent = `${convLeadsAgendados}%`;
-            
-            const convAgendadosReunioes = (mtd.reunioes.realizado / mtd.agendados.realizado * 100).toFixed(1);
-            document.getElementById('conv-agendados-reunioes').textContent = `${convAgendadosReunioes}%`;
-            
-            const convReunioesVendas = (mtd.vendas.realizado / mtd.reunioes.realizado * 100).toFixed(1);
-            document.getElementById('conv-reunioes-vendas').textContent = `${convReunioesVendas}%`;
-            
-            const ticketMedio = mtd.receita.realizado / mtd.vendas.realizado;
-            document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        }
-        
-        function updateCharts(labels, data) {
-            const stages = ['leads', 'agendados', 'reunioes', 'vendas', 'receita'];
-            const colors = {
-                leads: '#FFD93D',
-                agendados: '#5B68F5',
-                reunioes: '#A64DFF',
-                vendas: '#FF6BBF',
-                receita: '#5FC88F'
-            };
-            
-            stages.forEach(stage => {
-                const ctx = document.getElementById(`chart${stage.charAt(0).toUpperCase() + stage.slice(1)}`).getContext('2d');
-                
-                if (charts[stage]) {
-                    charts[stage].destroy();
-                }
-                
-                const isReceita = stage === 'receita';
-                
-                charts[stage] = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Esperado',
-                                data: data[stage].esperado,
-                                borderColor: '#95A5A6',
-                                backgroundColor: 'rgba(149, 165, 166, 0.1)',
-                                borderWidth: 2,
-                                borderDash: [5, 5],
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Realizado',
-                                data: data[stage].realizado,
-                                borderColor: colors[stage],
-                                backgroundColor: `${colors[stage]}33`,
-                                borderWidth: 3,
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: (context) => {
-                                        let label = context.dataset.label || '';
-                                        if (label) label += ': ';
-                                        if (isReceita) {
-                                            label += 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                                        } else {
-                                            label += context.parsed.y.toLocaleString('pt-BR');
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: (value) => {
-                                        if (isReceita) {
-                                            return 'R$ ' + value.toLocaleString('pt-BR');
-                                        }
-                                        return value.toLocaleString('pt-BR');
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-        }
-        
+
         function highlightChart(stage) {
             document.querySelectorAll('.chart-card').forEach(card => card.classList.remove('highlight'));
             document.querySelectorAll('.funnel-stage').forEach(s => s.classList.remove('active'));
             
-            document.getElementById(`chart-${stage}`).classList.add('highlight');
-            document.querySelector(`[data-stage="${stage}"]`).classList.add('active');
+            const chartCard = document.getElementById(`chart-${stage}-card`);
+            const funnelStage = document.querySelector(`[data-stage="${stage}"]`);
             
-            document.getElementById(`chart-${stage}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (chartCard) chartCard.classList.add('highlight');
+            if (funnelStage) funnelStage.classList.add('active');
+            
+            if (chartCard) {
+                chartCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password-input');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+            }
+        });
     </script>
 
 </body>
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDu6I3FZi0d82lGqOlQ1R8eossurX%2FuJxqNT2k4HnRjG0y%2FG2UkQ%2Bav1mnjQbPrAj8Q%2BTsCnFxvXoEfvelK1PQjBvnLj%2FZCSbM22N7f71IMeAcXd8kroPatTcH2p0EfVYd67%2FsyZnym2M3e%2BJOaPkjzWrFU0lJbfNwYxyiuEQQQat0Tid6sT1shOWZzw0%2BadjfttqDgVB%2Fj%2BhzoKna69yESe2gSYXwzn0EI4udjB3dOsdkpy1LHupDjICSEgfplcBQH4hE%2FhjuEGCh%2BKhRtzQC1w8utEmDV1I8EsV9c1QJc5zJLVjwCHcJbAbJodj74PLxt5f7GCt%2B4yxu%2F%2FNg0A0ZflYMriZRsOWh%2FZ0WOEEmw%2Fx3JfC399Yxm9sba7K4BRAnp1tlmUWePKaW5u9m964qc9CjwPD%2FhUTZORXHCfe0o%2FdUCXe4uOZfyJ%2FASfJ7p6zQ7E2gg8SIB%2FuXQ6HTjEmTOjiFLe15palWbtpMc2%2FC4qG9S2d45LAmGeYpi5jaBwvfHEY5lq6uT6fK5dvki%2BWlwuSwEszOfVkkRitE4VfYXb8bvo2KB%2FO20cMrmNTrDKRb%2BGewg7M8LNcQR5Kj%2BciXPMFhTdGIYJ4pTfiHXIMfOwh";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDtzuU1JlgCTzz5yADCglO%2BOHwX3U9Z9ksILOEoiLmRnCIA6fNSzU7wx4Ca820w0r9UrhL1uUo6gUhadDbkcRfx7KxhBIFhZS9HbZEjBVmC5LlUE3kXDIexbLKXwA7h3SuzbhfV2poJhjlvit%2FutdVKxMsnaGAwb2fJoykhobWk09W7WVRvbtHEDbu4t9QMr6hCi2sTYbMZasnacK6DxPkyNZgEDF%2BYVGBTYrWxwP%2BOAavVrdTI%2B%2BXiONDxA5fi5yHguPQouBlnwU2hU7bRIkugKWvK%2Bb1Ky5uhEDnPU3oF%2BHvJCcnLVlGqhRFTGlCs4VB7yn11Ykv%2BZehy8OqBsrSGuC3eN4rrY5pIFHxX1DX%2B4Wq3caqzO4lAij4RiUCG5cgiRWIE4aG5QrVgcMNoGg8ab2zZC9wh5Y4NbKdbTOjfZur5OHvNnbHlIzdsr4zHMZ0V%2FHAlupj20Mzo21VZOTk5C%2B%2FR9EoPgNsTxy93soxZMa1g6PsuzKYaiDgNVXhYh3t8pipgaca2kgv4sVZHXgSFt4HT1D6Ot1WKismOezR3jSZFZ7iidxr7YOEH2M0WbrWWStALvakdDWQuWti4mYjcs%3D";
         window.__genspark_locale = "pt-BR";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDu6I3FZi0d82lGqOlQ1R8eossurX/uJxqNT2k4HnRjG0y/G2UkQ+av1mnjQbPrAj8Q+TsCnFxvXoEfvelK1PQjBvnLj/ZCSbM22N7f71IMeAcXd8kroPatTcH2p0EfVYd67/syZnym2M3e+JOaPkjzWrFU0lJbfNwYxyiuEQQQat0Tid6sT1shOWZzw0+adjfttqDgVB/j+hzoKna69yESe2gSYXwzn0EI4udjB3dOsdkpy1LHupDjICSEgfplcBQH4hE/hjuEGCh+KhRtzQC1w8utEmDV1I8EsV9c1QJc5zJLVjwCHcJbAbJodj74PLxt5f7GCt+4yxu//Ng0A0ZflYMriZRsOWh/Z0WOEEmw/x3JfC399Yxm9sba7K4BRAnp1tlmUWePKaW5u9m964qc9CjwPD/hUTZORXHCfe0o/dUCXe4uOZfyJ/ASfJ7p6zQ7E2gg8SIB/uXQ6HTjEmTOjiFLe15palWbtpMc2/C4qG9S2d45LAmGeYpi5jaBwvfHEY5lq6uT6fK5dvki+WlwuSwEszOfVkkRitE4VfYXb8bvo2KB/O20cMrmNTrDKRb+Gewg7M8LNcQR5Kj+ciXPMFhTdGIYJ4pTfiHXIMfOwh";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDtzuU1JlgCTzz5yADCglO+OHwX3U9Z9ksILOEoiLmRnCIA6fNSzU7wx4Ca820w0r9UrhL1uUo6gUhadDbkcRfx7KxhBIFhZS9HbZEjBVmC5LlUE3kXDIexbLKXwA7h3SuzbhfV2poJhjlvit/utdVKxMsnaGAwb2fJoykhobWk09W7WVRvbtHEDbu4t9QMr6hCi2sTYbMZasnacK6DxPkyNZgEDF+YVGBTYrWxwP+OAavVrdTI++XiONDxA5fi5yHguPQouBlnwU2hU7bRIkugKWvK+b1Ky5uhEDnPU3oF+HvJCcnLVlGqhRFTGlCs4VB7yn11Ykv+Zehy8OqBsrSGuC3eN4rrY5pIFHxX1DX+4Wq3caqzO4lAij4RiUCG5cgiRWIE4aG5QrVgcMNoGg8ab2zZC9wh5Y4NbKdbTOjfZur5OHvNnbHlIzdsr4zHMZ0V/HAlupj20Mzo21VZOTk5C+/R9EoPgNsTxy93soxZMa1g6PsuzKYaiDgNVXhYh3t8pipgaca2kgv4sVZHXgSFt4HT1D6Ot1WKismOezR3jSZFZ7iidxr7YOEH2M0WbrWWStALvakdDWQuWti4mYjcs=";
     </script>
     
+        <script id="html_badge_script2" src="https://www.genspark.ai/html_badge.js"></script>
+        
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
     
