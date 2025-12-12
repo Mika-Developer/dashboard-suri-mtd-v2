@@ -199,6 +199,29 @@
             border-color: var(--suri-blue);
             box-shadow: 0 0 0 4px rgba(91, 104, 245, 0.1);
         }
+
+        /* NOVO: seletor de dia */
+        #day-selector {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #day-selector:hover {
+            border-color: var(--suri-blue);
+        }
+        
+        #day-selector:focus {
+            outline: none;
+            border-color: var(--suri-blue);
+            box-shadow: 0 0 0 4px rgba(91, 104, 245, 0.1);
+        }
         
         .main-container {
             padding: 0;
@@ -467,12 +490,15 @@
                 <img src="assets/logo-suri.png" alt="Logo Suri" class="logo-suri">
                 <div class="header-title">
                     <h1>Suri Dashboard MTD</h1>
-                    <span class="mtd-info" id="current-month">MTD até 08/12/2025</span>
+                    <span class="mtd-info" id="current-month">MTD até --/--/----</span>
                 </div>
             </div>
             <div class="month-selector">
                 <label for="month-selector">Mês:</label>
                 <select id="month-selector"></select>
+
+                <label for="day-selector" style="margin-left: 0.75rem;">Dia:</label>
+                <select id="day-selector"></select>
             </div>
         </header>
 
@@ -646,7 +672,9 @@
             const month = parseInt(parts[1], 10) - 1;
             const year = parseInt(parts[2], 10);
             if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
-            return new Date(year, month, day);
+            const d = new Date(year, month, day);
+            d.setHours(0, 0, 0, 0);
+            return d;
         }
 
         function cleanNumericValue(val) {
@@ -678,6 +706,10 @@
                 });
             });
             
+            Object.keys(monthMap).forEach(key => {
+                monthMap[key].sort((a, b) => a.date - b.date);
+            });
+            
             return monthMap;
         }
 
@@ -695,10 +727,45 @@
             return keys.length > 0 ? keys[0] : currentKey;
         }
 
-        function computeMTDForMonth(monthData) {
+        let allMonthsData = {};
+        let currentMonthKey = '';
+        let currentDateLimit = null;
+
+        function setDefaultDateLimitForCurrentMonth() {
+            const monthData = allMonthsData[currentMonthKey];
+            if (!monthData || monthData.length === 0) {
+                currentDateLimit = null;
+                return;
+            }
+
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
+            const [yearStr, monthStr] = currentMonthKey.split('-');
+            const year = parseInt(yearStr, 10);
+            const month = parseInt(monthStr, 10) - 1;
+
+            const monthIsCurrent = (
+                year === today.getFullYear() &&
+                month === today.getMonth()
+            );
+
+            let candidateDates = monthData.map(item => item.date);
+
+            if (monthIsCurrent) {
+                const limited = candidateDates.filter(d => d <= today);
+                if (limited.length > 0) {
+                    candidateDates = limited;
+                }
+            }
+
+            currentDateLimit = candidateDates[candidateDates.length - 1];
+        }
+
+        function computeMTDForMonth(monthData, limitDate) {
+            const limit = limitDate ? new Date(limitDate.getTime()) : new Date();
+            limit.setHours(0, 0, 0, 0);
+
             const result = {
                 labels: [],
                 leadsEsperado: [],
@@ -719,41 +786,39 @@
                     receita: { meta: 0, realizado: 0 }
                 }
             };
-            
-            monthData.sort((a, b) => a.date - b.date);
-            
+
             monthData.forEach(item => {
                 const { date, row } = item;
-                
-                if (date > today) return;
-                
-                const day = date.getDate();
+                const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                if (d > limit) return;
+
+                const day = d.getDate();
                 result.labels.push(day);
-                
+
                 const leadsEsp = cleanNumericValue(row[1]);
                 const agendadosEsp = cleanNumericValue(row[5]);
                 const reunioesEsp = cleanNumericValue(row[9]);
                 const vendasEsp = cleanNumericValue(row[13]);
                 const receitaEsp = cleanNumericValue(row[17]);
-                
+
                 result.leadsEsperado.push(leadsEsp);
                 result.agendadosEsperado.push(agendadosEsp);
                 result.reunioesEsperado.push(reunioesEsp);
                 result.vendasEsperado.push(vendasEsp);
                 result.receitaEsperado.push(receitaEsp);
-                
+
                 const leadsReal = cleanNumericValue(row[3]);
                 const agendadosReal = cleanNumericValue(row[7]);
                 const reunioesReal = cleanNumericValue(row[11]);
                 const vendasReal = cleanNumericValue(row[15]);
                 const receitaReal = cleanNumericValue(row[19]);
-                
+
                 result.leadsRealizado.push(leadsReal);
                 result.agendadosRealizado.push(agendadosReal);
                 result.reunioesRealizado.push(reunioesReal);
                 result.vendasRealizado.push(vendasReal);
                 result.receitaRealizado.push(receitaReal);
-                
+
                 result.mtd.leads.meta = leadsEsp;
                 result.mtd.leads.realizado = leadsReal;
                 result.mtd.agendados.meta = agendadosEsp;
@@ -765,7 +830,7 @@
                 result.mtd.receita.meta = receitaEsp;
                 result.mtd.receita.realizado = receitaReal;
             });
-            
+
             return result;
         }
 
@@ -792,9 +857,6 @@
             }).format(value);
         }
 
-        let allMonthsData = {};
-        let currentMonthKey = '';
-
         function loadData() {
             Papa.parse(SHEET_URL, {
                 download: true,
@@ -804,8 +866,10 @@
                     allMonthsData = groupRowsByMonth(rows);
                     
                     currentMonthKey = getDefaultMonthKey(allMonthsData);
+                    setDefaultDateLimitForCurrentMonth();
                     
                     populateMonthSelector();
+                    populateDaySelector();
                     
                     processCurrentMonth();
                 },
@@ -843,8 +907,72 @@
             
             selector.addEventListener('change', function() {
                 currentMonthKey = this.value;
+                setDefaultDateLimitForCurrentMonth();
+                populateDaySelector();
                 processCurrentMonth();
             });
+        }
+
+        function populateDaySelector() {
+            const daySelector = document.getElementById('day-selector');
+            if (!daySelector) return;
+
+            daySelector.innerHTML = '';
+
+            const monthData = allMonthsData[currentMonthKey];
+            if (!monthData || monthData.length === 0) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const [yearStr, monthStr] = currentMonthKey.split('-');
+            const year = parseInt(yearStr, 10);
+            const month = parseInt(monthStr, 10) - 1;
+
+            const monthIsCurrent =
+                year === today.getFullYear() &&
+                month === today.getMonth();
+
+            let rowsForDays = monthData;
+
+            if (monthIsCurrent) {
+                const limited = monthData.filter(item => item.date <= today);
+                if (limited.length > 0) {
+                    rowsForDays = limited;
+                }
+            }
+
+            rowsForDays.forEach(item => {
+                const d = item.date;
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+
+                const opt = document.createElement('option');
+                opt.value = `${yyyy}-${mm}-${dd}`;
+                opt.textContent = dd;
+                daySelector.appendChild(opt);
+            });
+
+            if (currentDateLimit) {
+                const dd = String(currentDateLimit.getDate()).padStart(2, '0');
+                const mm = String(currentDateLimit.getMonth() + 1).padStart(2, '0');
+                const yyyy = currentDateLimit.getFullYear();
+                const val = `${yyyy}-${mm}-${dd}`;
+                const hasOption = Array.from(daySelector.options).some(o => o.value === val);
+                if (hasOption) {
+                    daySelector.value = val;
+                } else if (daySelector.options.length > 0) {
+                    daySelector.value = daySelector.options[daySelector.options.length - 1].value;
+                }
+            }
+
+            daySelector.onchange = (e) => {
+                const [yyyy, mm, dd] = e.target.value.split('-').map(Number);
+                currentDateLimit = new Date(yyyy, mm - 1, dd);
+                currentDateLimit.setHours(0, 0, 0, 0);
+                processCurrentMonth();
+            };
         }
 
         function processCurrentMonth() {
@@ -854,7 +982,10 @@
             }
             
             const monthData = allMonthsData[currentMonthKey];
-            const mtdData = computeMTDForMonth(monthData);
+            if (!currentDateLimit) {
+                setDefaultDateLimitForCurrentMonth();
+            }
+            const mtdData = computeMTDForMonth(monthData, currentDateLimit);
             
             updateDashboard(mtdData);
         }
@@ -904,9 +1035,11 @@
             const ticketMedio = mtd.vendas.realizado > 0 ? (mtd.receita.realizado / mtd.vendas.realizado) : 0;
             document.getElementById('ticket-medio').textContent = formatCurrency(ticketMedio);
             
-            const today = new Date();
-            const [year, month] = currentMonthKey.split('-');
-            document.getElementById('current-month').textContent = `MTD até ${today.getDate()}/${month}/${year}`;
+            const refDate = currentDateLimit || new Date();
+            const day = String(refDate.getDate()).padStart(2, '0');
+            const month = String(refDate.getMonth() + 1).padStart(2, '0');
+            const year = refDate.getFullYear();
+            document.getElementById('current-month').textContent = `MTD até ${day}/${month}/${year}`;
             
             updateCharts(data);
         }
