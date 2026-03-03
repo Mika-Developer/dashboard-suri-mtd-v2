@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
             --suri-blue:       #5B68F5;
             --suri-blue-light: #7B88FF;
@@ -29,59 +29,24 @@
             --text-main:  #E8ECFF;
             --text-muted: #6B7299;
         }
+        body { font-family: 'Sora', sans-serif; background: var(--bg-base); min-height: 100vh; color: var(--text-main); overflow: hidden; }
 
-        body {
-            font-family: 'Sora', sans-serif;
-            background: var(--bg-base);
-            min-height: 100vh;
-            color: var(--text-main);
-            overflow: hidden;
-        }
-
-        /* ───── LOGIN ───── */
-        #login-screen {
-            position: fixed; inset: 0;
-            background: radial-gradient(ellipse at 60% 40%, rgba(91,104,245,0.25) 0%, transparent 60%), var(--bg-base);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999;
-        }
-        .login-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 3rem; border-radius: 24px;
-            box-shadow: 0 0 60px rgba(91,104,245,0.15);
-            text-align: center; max-width: 400px; width: 90%;
-        }
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: radial-gradient(ellipse at 60% 40%, rgba(91,104,245,0.25) 0%, transparent 60%), var(--bg-base); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: var(--bg-card); border: 1px solid var(--border); padding: 3rem; border-radius: 24px; box-shadow: 0 0 60px rgba(91,104,245,0.15); text-align: center; max-width: 400px; width: 90%; }
         .login-logo { width: 110px; margin-bottom: 1.5rem; filter: brightness(0) invert(1); }
         .login-box h2 { font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; }
-        .login-box p  { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; }
-        .login-input {
-            width: 100%; padding: 0.95rem 1.4rem;
-            background: var(--bg-input); border: 1.5px solid var(--border);
-            border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 1rem;
-            color: var(--text-main); transition: all 0.3s; margin-bottom: 1.2rem;
-        }
+        .login-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        .login-input { width: 100%; padding: 0.95rem 1.4rem; background: var(--bg-input); border: 1.5px solid var(--border); border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 1rem; color: var(--text-main); transition: all 0.3s; margin-bottom: 1.2rem; }
         .login-input::placeholder { color: var(--text-muted); }
         .login-input:focus { outline: none; border-color: var(--suri-blue); box-shadow: 0 0 0 4px var(--suri-blue-glow); }
-        .login-btn {
-            width: 100%; padding: 0.95rem;
-            background: linear-gradient(135deg, var(--suri-blue), var(--suri-blue-light));
-            color: white; border: none; border-radius: 12px;
-            font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 20px var(--suri-blue-glow);
-        }
+        .login-btn { width: 100%; padding: 0.95rem; background: linear-gradient(135deg, var(--suri-blue), var(--suri-blue-light)); color: white; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px var(--suri-blue-glow); }
         .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--suri-blue-glow); }
         .error-message { color: var(--suri-red); font-size: 0.88rem; margin-top: 1rem; display: none; }
 
-        /* ───── DASHBOARD ───── */
+        /* DASHBOARD */
         #dashboard-content { display: none; height: 100vh; overflow: hidden; }
-
-        .header {
-            background: var(--bg-card); border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem; display: flex; align-items: center;
-            justify-content: space-between; gap: 1rem;
-        }
+        .header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
         .header-left { display: flex; align-items: center; gap: 1rem; }
         .logo-suri { width: 90px; height: auto; filter: brightness(0) invert(1); }
         .header-divider { width: 1px; height: 36px; background: var(--border); }
@@ -89,35 +54,20 @@
         .mtd-info { font-size: 0.78rem; color: var(--text-muted); font-weight: 400; margin-top: 0.2rem; display: block; }
         .header-controls { display: flex; align-items: center; gap: 0.6rem; }
         .ctrl-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-        .ctrl-select {
-            padding: 0.5rem 1rem; background: var(--bg-input);
-            border: 1.5px solid var(--border); border-radius: 10px;
-            font-family: 'Sora', sans-serif; font-size: 0.85rem;
-            color: var(--text-main); cursor: pointer; transition: all 0.3s;
-        }
-        .ctrl-select:hover  { border-color: var(--suri-blue); }
-        .ctrl-select:focus  { outline: none; border-color: var(--suri-blue); box-shadow: 0 0 0 3px var(--suri-blue-glow); }
+        .ctrl-select { padding: 0.5rem 1rem; background: var(--bg-input); border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Sora', sans-serif; font-size: 0.85rem; color: var(--text-main); cursor: pointer; transition: all 0.3s; }
+        .ctrl-select:hover { border-color: var(--suri-blue); }
+        .ctrl-select:focus { outline: none; border-color: var(--suri-blue); box-shadow: 0 0 0 3px var(--suri-blue-glow); }
         .ctrl-select option { background: var(--bg-card2); }
 
         .main-container { height: calc(100vh - 70px); overflow: hidden; padding: 1.25rem 1.5rem; }
         .grid-container { display: grid; grid-template-columns: 420px 1fr; gap: 1.25rem; height: 100%; }
 
-        /* ── FUNNEL ── */
-        .funnel-column {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 20px; padding: 1.25rem;
-            overflow-y: auto; overflow-x: hidden;
-            display: flex; flex-direction: column; gap: 0;
-        }
+        /* FUNNEL */
+        .funnel-column { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 1.25rem; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 0; }
         .funnel-column::-webkit-scrollbar { width: 4px; }
         .funnel-column::-webkit-scrollbar-track { background: transparent; }
         .funnel-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-        .funnel-stage {
-            position: relative; padding: 1rem 1.4rem; margin: 0.3rem auto;
-            cursor: pointer; transition: all 0.25s; border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.05); background: var(--stage-bg); flex-shrink: 0;
-        }
+        .funnel-stage { position: relative; padding: 1rem 1.4rem; margin: 0.3rem auto; cursor: pointer; transition: all 0.25s; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); background: var(--stage-bg); flex-shrink: 0; }
         .funnel-stage:hover { transform: translateX(4px); filter: brightness(1.1); }
         .funnel-stage.active { box-shadow: 0 0 0 2px var(--suri-blue), 0 0 20px var(--suri-blue-glow); }
         .funnel-stage:nth-child(1) { width: 100%; --stage-bg: rgba(255,217,61,0.12);  --accent: var(--suri-yellow); }
@@ -125,7 +75,6 @@
         .funnel-stage:nth-child(5) { width: 80%;  --stage-bg: rgba(166,77,255,0.12);  --accent: var(--suri-purple); }
         .funnel-stage:nth-child(7) { width: 70%;  --stage-bg: rgba(255,107,191,0.12); --accent: var(--suri-pink); }
         .funnel-stage:nth-child(9) { width: 60%;  --stage-bg: rgba(95,200,143,0.12);  --accent: var(--suri-green); }
-
         .stage-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; }
         .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; box-shadow: 0 0 8px var(--accent); }
         .stage-name { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -136,27 +85,20 @@
         .data-percentage { font-size: 0.78rem; font-weight: 600; margin-top: 0.1rem; }
         .data-percentage.positive { color: var(--suri-green); }
         .data-percentage.negative { color: var(--suri-red); }
-
         .conversion-badge { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.3rem 0; flex-shrink: 0; }
         .conversion-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
         .conversion-value { font-size: 0.85rem; font-weight: 700; color: var(--suri-blue); background: rgba(91,104,245,0.12); padding: 0.15rem 0.6rem; border-radius: 20px; }
-
         .ticket-medio-badge { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.3rem 0; flex-shrink: 0; }
         .ticket-medio-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
         .ticket-medio-value { font-size: 0.85rem; font-weight: 700; color: var(--suri-green); background: rgba(95,200,143,0.12); padding: 0.15rem 0.6rem; border-radius: 20px; }
 
-        /* ── CHARTS ── */
+        /* CHARTS */
         .charts-column { display: flex; flex-direction: column; gap: 1.25rem; overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
         .charts-column::-webkit-scrollbar { width: 4px; }
         .charts-column::-webkit-scrollbar-track { background: transparent; }
         .charts-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
         .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; flex-shrink: 0; }
-        .kpi-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 1rem 1.2rem;
-            transition: all 0.25s; position: relative; overflow: hidden;
-        }
+        .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.2rem; transition: all 0.25s; position: relative; overflow: hidden; }
         .kpi-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color); border-radius: 0 0 16px 16px; }
         .kpi-card:hover { border-color: var(--kpi-color); box-shadow: 0 0 20px rgba(0,0,0,0.3); transform: translateY(-2px); }
         .kpi-card:nth-child(1) { --kpi-color: var(--suri-yellow); }
@@ -169,36 +111,16 @@
         .kpi-sub { font-size: 0.75rem; font-weight: 600; margin-top: 0.35rem; }
         .kpi-sub.positive { color: var(--suri-green); }
         .kpi-sub.negative { color: var(--suri-red); }
-
-        .chart-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 1.25rem; transition: all 0.25s;
-            height: 240px; max-height: 240px; flex-shrink: 0;
-        }
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; transition: all 0.25s; height: 240px; max-height: 240px; flex-shrink: 0; }
         .chart-card canvas { height: 175px !important; max-height: 175px !important; }
         .chart-card.highlight { border-color: var(--suri-blue); box-shadow: 0 0 0 1px var(--suri-blue), 0 0 30px var(--suri-blue-glow); }
         .chart-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em; }
-
         .footer { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 0.5rem; font-size: 0.78rem; color: var(--text-muted); background: transparent; pointer-events: none; }
         .heart-icon { color: var(--suri-blue); }
-
-        /* Loading */
-        .loading-overlay {
-            position: fixed; inset: 0; background: rgba(13,15,26,0.7);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 999; display: none;
-        }
-        .loading-spinner {
-            width: 40px; height: 40px; border: 3px solid var(--border);
-            border-top-color: var(--suri-blue); border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(13,15,26,0.7); align-items: center; justify-content: center; z-index: 999; display: none; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--suri-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 1100px) {
-            .grid-container { grid-template-columns: 1fr; height: auto; }
-            .kpi-row { grid-template-columns: repeat(3, 1fr); }
-        }
+        @media (max-width: 1100px) { .grid-container { grid-template-columns: 1fr; height: auto; } .kpi-row { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
@@ -241,7 +163,6 @@
 
     <div class="main-container">
         <div class="grid-container">
-
             <!-- FUNIL -->
             <div class="funnel-column">
                 <div class="funnel-stage" data-stage="leads" onclick="highlightChart('leads')">
@@ -252,10 +173,7 @@
                         <div class="data-item"><div class="data-label">Desempenho</div><div class="data-percentage negative" id="leads-percent">0%</div></div>
                     </div>
                 </div>
-                <div class="conversion-badge">
-                    <span class="conversion-label">↓ conversão</span>
-                    <span class="conversion-value" id="conv-leads-agendados">0%</span>
-                </div>
+                <div class="conversion-badge"><span class="conversion-label">↓ conversão</span><span class="conversion-value" id="conv-leads-agendados">0%</span></div>
                 <div class="funnel-stage" data-stage="agendados" onclick="highlightChart('agendados')">
                     <div class="stage-header"><div class="stage-dot"></div><span class="stage-name">Agendados</span></div>
                     <div class="stage-data">
@@ -264,22 +182,16 @@
                         <div class="data-item"><div class="data-label">Desempenho</div><div class="data-percentage negative" id="agendados-percent">0%</div></div>
                     </div>
                 </div>
-                <div class="conversion-badge">
-                    <span class="conversion-label">↓ conversão</span>
-                    <span class="conversion-value" id="conv-agendados-reunioes">0%</span>
-                </div>
+                <div class="conversion-badge"><span class="conversion-label">↓ conversão</span><span class="conversion-value" id="conv-agendados-reunioes">0%</span></div>
                 <div class="funnel-stage" data-stage="reunioes" onclick="highlightChart('reunioes')">
-                    <div class="stage-header"><div class="stage-dot"></div><span class="stage-name">Reuniões</span></div>
+                    <div class="stage-header"><div class="stage-dot"></div><span class="stage-name">Shows</span></div>
                     <div class="stage-data">
                         <div class="data-item"><div class="data-label">Realizado</div><div class="data-value" id="reunioes-realizado">0</div></div>
                         <div class="data-item"><div class="data-label">Esperado</div><div class="data-value" id="reunioes-esperado">0</div></div>
                         <div class="data-item"><div class="data-label">Desempenho</div><div class="data-percentage negative" id="reunioes-percent">0%</div></div>
                     </div>
                 </div>
-                <div class="conversion-badge">
-                    <span class="conversion-label">↓ conversão</span>
-                    <span class="conversion-value" id="conv-reunioes-vendas">0%</span>
-                </div>
+                <div class="conversion-badge"><span class="conversion-label">↓ conversão</span><span class="conversion-value" id="conv-reunioes-vendas">0%</span></div>
                 <div class="funnel-stage" data-stage="vendas" onclick="highlightChart('vendas')">
                     <div class="stage-header"><div class="stage-dot"></div><span class="stage-name">Vendas</span></div>
                     <div class="stage-data">
@@ -288,10 +200,7 @@
                         <div class="data-item"><div class="data-label">Desempenho</div><div class="data-percentage negative" id="vendas-percent">0%</div></div>
                     </div>
                 </div>
-                <div class="ticket-medio-badge">
-                    <span class="ticket-medio-label">💵 Ticket Médio</span>
-                    <span class="ticket-medio-value" id="ticket-medio">R$ 0</span>
-                </div>
+                <div class="ticket-medio-badge"><span class="ticket-medio-label">💵 Ticket Médio</span><span class="ticket-medio-value" id="ticket-medio">R$ 0</span></div>
                 <div class="funnel-stage" data-stage="receita" onclick="highlightChart('receita')">
                     <div class="stage-header"><div class="stage-dot"></div><span class="stage-name">Receita</span></div>
                     <div class="stage-data">
@@ -307,27 +216,30 @@
                 <div class="kpi-row">
                     <div class="kpi-card"><div class="kpi-label">🎯 Leads</div><div class="kpi-value" id="kpi-leads">0</div><div class="kpi-sub negative" id="kpi-leads-sub">0%</div></div>
                     <div class="kpi-card"><div class="kpi-label">📅 Agendados</div><div class="kpi-value" id="kpi-agendados">0</div><div class="kpi-sub negative" id="kpi-agendados-sub">0%</div></div>
-                    <div class="kpi-card"><div class="kpi-label">🤝 Reuniões</div><div class="kpi-value" id="kpi-reunioes">0</div><div class="kpi-sub negative" id="kpi-reunioes-sub">0%</div></div>
+                    <div class="kpi-card"><div class="kpi-label">🤝 Shows</div><div class="kpi-value" id="kpi-reunioes">0</div><div class="kpi-sub negative" id="kpi-reunioes-sub">0%</div></div>
                     <div class="kpi-card"><div class="kpi-label">💰 Vendas</div><div class="kpi-value" id="kpi-vendas">0</div><div class="kpi-sub negative" id="kpi-vendas-sub">0%</div></div>
                     <div class="kpi-card"><div class="kpi-label">📊 Receita</div><div class="kpi-value" id="kpi-receita">R$0</div><div class="kpi-sub positive" id="kpi-receita-sub">0%</div></div>
                 </div>
                 <div class="chart-card" id="chart-leads-card"><div class="chart-title">🎯 Evolução — Leads</div><canvas id="chart-leads"></canvas></div>
                 <div class="chart-card" id="chart-agendados-card"><div class="chart-title">📅 Evolução — Agendados</div><canvas id="chart-agendados"></canvas></div>
-                <div class="chart-card" id="chart-reunioes-card"><div class="chart-title">🤝 Evolução — Reuniões</div><canvas id="chart-reunioes"></canvas></div>
+                <div class="chart-card" id="chart-reunioes-card"><div class="chart-title">🤝 Evolução — Shows</div><canvas id="chart-reunioes"></canvas></div>
                 <div class="chart-card" id="chart-vendas-card"><div class="chart-title">💰 Evolução — Vendas</div><canvas id="chart-vendas"></canvas></div>
                 <div class="chart-card" id="chart-receita-card"><div class="chart-title">📊 Evolução — Receita</div><canvas id="chart-receita"></canvas></div>
             </div>
-
         </div>
     </div>
-
     <footer class="footer">By Mika <span class="heart-icon">💙</span></footer>
 </div>
 
 <script>
-    // ─── CONFIGURAÇÃO ───────────────────────────────────────────────
-    const API_URL  = 'https://suri-api-alpha.vercel.app/api/pipedrive';
+    // ─── CONFIGURAÇÃO ────────────────────────────────────────────────
+    const API_URL = 'https://suri-api-alpha.vercel.app/api/pipedrive';
     const PASSWORD = 'borasuri2025';
+
+    const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/1kDi5WuS5FH7_VElz-ek4EnOks_QLv2CGRcE1_TwX9es/export?format=csv';
+    const SHEET_AGENDADOS = `${SHEET_BASE}&gid=2043430867`;
+    const SHEET_SHOW      = `${SHEET_BASE}&gid=1766150013`;
+    const SHEET_VENDAS    = `${SHEET_BASE}&gid=561822321`;
 
     // ── METAS MENSAIS (edite conforme necessário) ──
     const METAS = {
@@ -338,7 +250,7 @@
         receita:   50000
     };
 
-    // ─── HELPERS ────────────────────────────────────────────────────
+    // ─── HELPERS ─────────────────────────────────────────────────────
     function calcPercentDeviation(r, m) {
         if (m === 0) return r === 0 ? 0 : 100;
         return ((r / m) - 1) * 100;
@@ -356,7 +268,6 @@
         return new Date(year, month, 0).getDate();
     }
 
-    // Distribui meta mensal proporcionalmente por dia (acumulado)
     function buildExpectedCumulative(totalMeta, daysInMonth, upToDay) {
         const result = [];
         for (let d = 1; d <= upToDay; d++) {
@@ -369,19 +280,31 @@
         document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
     }
 
-    // ─── ESTADO ─────────────────────────────────────────────────────
+    function parseSheetDate(str) {
+        if (!str) return null;
+        // Formato: "2026-03-02 09:03:48"
+        const d = new Date(str.trim().substring(0, 10) + 'T00:00:00');
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function cleanCurrency(val) {
+        if (!val) return 0;
+        const str = String(val).replace(/[R$\s.]/g, '').replace(',', '.');
+        const num = parseFloat(str);
+        return isNaN(num) ? 0 : num;
+    }
+
+    // ─── ESTADO ──────────────────────────────────────────────────────
     let currentYear  = new Date().getFullYear();
     let currentMonth = new Date().getMonth() + 1;
     let currentDay   = new Date().getDate();
 
-    // ─── SELETORES ──────────────────────────────────────────────────
+    // ─── SELETORES ───────────────────────────────────────────────────
     function populateMonthSelector() {
         const sel = document.getElementById('month-selector');
         sel.innerHTML = '';
         const names = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
         const today = new Date();
-
-        // Gera os últimos 6 meses
         for (let i = 0; i < 6; i++) {
             let d = new Date(today.getFullYear(), today.getMonth() - i, 1);
             const y = d.getFullYear();
@@ -392,7 +315,6 @@
             if (y === currentYear && m === currentMonth) opt.selected = true;
             sel.appendChild(opt);
         }
-
         sel.addEventListener('change', function() {
             const [y, m] = this.value.split('-').map(Number);
             currentYear  = y;
@@ -401,7 +323,7 @@
             const isCurrentMonth = y === today2.getFullYear() && m === (today2.getMonth() + 1);
             currentDay = isCurrentMonth ? today2.getDate() : getDaysInMonth(y, m);
             populateDaySelector();
-            loadData();
+            loadAllData();
         });
     }
 
@@ -411,7 +333,6 @@
         const today = new Date();
         const isCurrentMonth = currentYear === today.getFullYear() && currentMonth === (today.getMonth() + 1);
         const maxDay = isCurrentMonth ? today.getDate() : getDaysInMonth(currentYear, currentMonth);
-
         for (let d = 1; d <= maxDay; d++) {
             const opt = document.createElement('option');
             opt.value = d;
@@ -419,35 +340,85 @@
             if (d === currentDay) opt.selected = true;
             sel.appendChild(opt);
         }
-
         sel.addEventListener('change', function() {
             currentDay = parseInt(this.value, 10);
-            loadData();
+            loadAllData();
         });
     }
 
-    // ─── CARREGAR DADOS DA API ───────────────────────────────────────
-    async function loadData(showSpinner = true) {
+    // ─── CARREGAR PLANILHA ───────────────────────────────────────────
+    function loadSheet(url) {
+        return new Promise((resolve, reject) => {
+            Papa.parse(url, {
+                download: true,
+                header: true,
+                complete: r => resolve(r.data),
+                error: reject
+            });
+        });
+    }
+
+    // ─── PROCESSAR DADOS DA PLANILHA ─────────────────────────────────
+    function processSheetData(rows, dateField, valueField = null) {
+        const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
+        const limitDate    = new Date(currentYear, currentMonth - 1, currentDay, 23, 59, 59);
+        const dailyData = {};
+        for (let i = 1; i <= currentDay; i++) dailyData[i] = { count: 0, value: 0 };
+
+        rows.forEach(row => {
+            const date = parseSheetDate(row[dateField]);
+            if (!date) return;
+            if (date < startOfMonth || date > limitDate) return;
+            const d = date.getDate();
+            if (dailyData[d] !== undefined) {
+                dailyData[d].count++;
+                if (valueField) dailyData[d].value += cleanCurrency(row[valueField]);
+            }
+        });
+
+        let cumCount = 0, cumValue = 0;
+        const countArr = [], valueArr = [];
+        for (let i = 1; i <= currentDay; i++) {
+            cumCount += dailyData[i].count;
+            cumValue += dailyData[i].value;
+            countArr.push(cumCount);
+            valueArr.push(cumValue);
+        }
+        return { countArr, valueArr, total: cumCount, totalValue: cumValue };
+    }
+
+    // ─── CARREGAR TODOS OS DADOS ─────────────────────────────────────
+    async function loadAllData(showSpinner = true) {
         if (showSpinner) showLoading(true);
         try {
-            const url = `${API_URL}?year=${currentYear}&month=${currentMonth}&day=${currentDay}`;
-            const res  = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            updateDashboard(data);
+            // Busca API Pipedrive (Leads) + Planilhas em paralelo
+            const [apiData, agendadosRows, showRows, vendasRows] = await Promise.all([
+                fetch(`${API_URL}?year=${currentYear}&month=${currentMonth}&day=${currentDay}`)
+                    .then(r => r.json()),
+                loadSheet(SHEET_AGENDADOS),
+                loadSheet(SHEET_SHOW),
+                loadSheet(SHEET_VENDAS),
+            ]);
+
+            // Processa planilhas
+            const agendados = processSheetData(agendadosRows, 'Negócio criado em');
+            const shows     = processSheetData(showRows,      'Negócio criado em');
+            const vendas    = processSheetData(vendasRows,    'Ganho em', 'Valor');
+
+            updateDashboard(apiData, agendados, shows, vendas);
+
         } catch (err) {
             console.error('Erro ao buscar dados:', err);
-            alert('Erro ao buscar dados da API. Verifique o console.');
+            alert('Erro ao buscar dados. Verifique o console.');
         } finally {
             showLoading(false);
         }
     }
 
     // ─── ATUALIZAR UI ────────────────────────────────────────────────
-    function updateDashboard(data) {
+    function updateDashboard(apiData, agendados, shows, vendas) {
         const daysInMonth = getDaysInMonth(currentYear, currentMonth);
 
-        // Calcula metas proporcionais ao dia atual
         const metaLeads     = Math.round((METAS.leads     / daysInMonth) * currentDay);
         const metaAgendados = Math.round((METAS.agendados / daysInMonth) * currentDay);
         const metaReunioes  = Math.round((METAS.reunioes  / daysInMonth) * currentDay);
@@ -455,23 +426,21 @@
         const metaReceita   = Math.round((METAS.receita   / daysInMonth) * currentDay);
 
         const mtd = {
-            leads:     { realizado: data.mtd.leads.realizado,     meta: metaLeads     },
-            agendados: { realizado: data.mtd.agendados.realizado, meta: metaAgendados },
-            reunioes:  { realizado: data.mtd.reunioes.realizado,  meta: metaReunioes  },
-            vendas:    { realizado: data.mtd.vendas.realizado,    meta: metaVendas    },
-            receita:   { realizado: data.mtd.receita.realizado,   meta: metaReceita   },
+            leads:     { realizado: apiData.mtd.leads.realizado, meta: metaLeads     },
+            agendados: { realizado: agendados.total,             meta: metaAgendados },
+            reunioes:  { realizado: shows.total,                 meta: metaReunioes  },
+            vendas:    { realizado: vendas.total,                meta: metaVendas    },
+            receita:   { realizado: vendas.totalValue,           meta: metaReceita   },
         };
 
         // Funil
-        const stages = [
+        [
             { id:'leads',     val: mtd.leads     },
             { id:'agendados', val: mtd.agendados },
             { id:'reunioes',  val: mtd.reunioes  },
             { id:'vendas',    val: mtd.vendas    },
             { id:'receita',   val: mtd.receita   },
-        ];
-
-        stages.forEach(({ id, val }) => {
+        ].forEach(({ id, val }) => {
             const isMoney = id === 'receita';
             const fmt = v => isMoney ? formatCurrency(v) : formatNumber(v);
             document.getElementById(`${id}-realizado`).textContent = fmt(val.realizado);
@@ -495,14 +464,13 @@
         document.getElementById('ticket-medio').textContent = formatCurrency(ticket);
 
         // KPI cards
-        const kpiMap = [
+        [
             { id:'leads',     val: mtd.leads,     fmt: formatNumber   },
             { id:'agendados', val: mtd.agendados, fmt: formatNumber   },
             { id:'reunioes',  val: mtd.reunioes,  fmt: formatNumber   },
             { id:'vendas',    val: mtd.vendas,    fmt: formatNumber   },
             { id:'receita',   val: mtd.receita,   fmt: formatCurrency },
-        ];
-        kpiMap.forEach(({ id, val, fmt }) => {
+        ].forEach(({ id, val, fmt }) => {
             document.getElementById(`kpi-${id}`).textContent = fmt(val.realizado);
             const perc = calcPercentDeviation(val.realizado, val.meta);
             const sub  = document.getElementById(`kpi-${id}-sub`);
@@ -514,27 +482,18 @@
         document.getElementById('current-month').textContent =
             `MTD até ${String(currentDay).padStart(2,'0')}/${String(currentMonth).padStart(2,'0')}/${currentYear}`;
 
-        // Gráficos — usa os dados acumulados da API + metas proporcionais
-        const labels = data.labels;
-        updateCharts(data, labels, daysInMonth);
+        updateCharts(apiData.leadsRealizado, agendados.countArr, shows.countArr, vendas.countArr, vendas.valueArr, apiData.labels, daysInMonth);
     }
 
     // ─── GRÁFICOS ────────────────────────────────────────────────────
     let chartInstances = { leads:null, agendados:null, reunioes:null, vendas:null, receita:null };
 
     const CHART_DEFAULTS = {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         interaction: { mode:'index', intersect:false },
         plugins: {
-            legend: {
-                display: true, position: 'bottom',
-                labels: { color:'#6B7299', font:{ family:'Sora', size:11 }, boxWidth:12, padding:14 }
-            },
-            tooltip: {
-                backgroundColor:'#151826', borderColor:'rgba(255,255,255,0.07)', borderWidth:1,
-                titleColor:'#E8ECFF', bodyColor:'#6B7299', padding:10
-            }
+            legend: { display: true, position: 'bottom', labels: { color:'#6B7299', font:{ family:'Sora', size:11 }, boxWidth:12, padding:14 } },
+            tooltip: { backgroundColor:'#151826', borderColor:'rgba(255,255,255,0.07)', borderWidth:1, titleColor:'#E8ECFF', bodyColor:'#6B7299', padding:10 }
         },
         scales: {
             x: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ color:'#6B7299', font:{ family:'Sora', size:10 } } },
@@ -544,17 +503,8 @@
 
     function makeDatasets(expected, realized, color) {
         return [
-            {
-                label:'Esperado', data:expected,
-                borderColor:'rgba(255,255,255,0.15)', backgroundColor:'transparent',
-                borderWidth:1.5, borderDash:[4,4], tension:0.4, pointRadius:0
-            },
-            {
-                label:'Realizado', data:realized,
-                borderColor:color,
-                backgroundColor:color.replace(')',',0.08)').replace('rgb','rgba'),
-                borderWidth:2.5, tension:0.4, pointRadius:3, pointBackgroundColor:color
-            }
+            { label:'Esperado', data:expected, borderColor:'rgba(255,255,255,0.15)', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,4], tension:0.4, pointRadius:0 },
+            { label:'Realizado', data:realized, borderColor:color, backgroundColor:color.replace(')',',0.08)').replace('rgb','rgba'), borderWidth:2.5, tension:0.4, pointRadius:3, pointBackgroundColor:color }
         ];
     }
 
@@ -567,23 +517,21 @@
         });
     }
 
-    function updateCharts(data, labels, daysInMonth) {
-        const upToDay = currentDay;
+    function updateCharts(leadsArr, agendadosArr, showsArr, vendasArr, receitaArr, labels, daysInMonth) {
+        const expLeads     = buildExpectedCumulative(METAS.leads,     daysInMonth, currentDay);
+        const expAgendados = buildExpectedCumulative(METAS.agendados, daysInMonth, currentDay);
+        const expReunioes  = buildExpectedCumulative(METAS.reunioes,  daysInMonth, currentDay);
+        const expVendas    = buildExpectedCumulative(METAS.vendas,    daysInMonth, currentDay);
+        const expReceita   = buildExpectedCumulative(METAS.receita,   daysInMonth, currentDay);
 
-        const expLeads     = buildExpectedCumulative(METAS.leads,     daysInMonth, upToDay);
-        const expAgendados = buildExpectedCumulative(METAS.agendados, daysInMonth, upToDay);
-        const expReunioes  = buildExpectedCumulative(METAS.reunioes,  daysInMonth, upToDay);
-        const expVendas    = buildExpectedCumulative(METAS.vendas,    daysInMonth, upToDay);
-        const expReceita   = buildExpectedCumulative(METAS.receita,   daysInMonth, upToDay);
-
-        buildChart('leads',     labels, expLeads,     data.leadsRealizado,     '#FFD93D');
-        buildChart('agendados', labels, expAgendados, data.agendadosRealizado, '#5B68F5');
-        buildChart('reunioes',  labels, expReunioes,  data.reunioesRealizado,  '#A64DFF');
-        buildChart('vendas',    labels, expVendas,    data.vendasRealizado,    '#FF6BBF');
-        buildChart('receita',   labels, expReceita,   data.receitaRealizado,   '#5FC88F');
+        buildChart('leads',     labels, expLeads,     leadsArr,     '#FFD93D');
+        buildChart('agendados', labels, expAgendados, agendadosArr, '#5B68F5');
+        buildChart('reunioes',  labels, expReunioes,  showsArr,     '#A64DFF');
+        buildChart('vendas',    labels, expVendas,    vendasArr,    '#FF6BBF');
+        buildChart('receita',   labels, expReceita,   receitaArr,   '#5FC88F');
     }
 
-    // ─── AUTH ────────────────────────────────────────────────────────
+    // ─── AUTH ─────────────────────────────────────────────────────────
     function checkPassword() {
         const val = document.getElementById('password-input').value;
         const err = document.getElementById('error-message');
@@ -592,8 +540,8 @@
             document.getElementById('dashboard-content').style.display = 'block';
             populateMonthSelector();
             populateDaySelector();
-            loadData();
-            setInterval(() => loadData(false), 60000);
+            loadAllData();
+            setInterval(() => loadAllData(false), 60000);
         } else {
             err.style.display = 'block';
             document.getElementById('password-input').value = '';
